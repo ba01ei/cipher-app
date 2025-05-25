@@ -11,7 +11,7 @@ import UIKit
 import WebKit
 
 /// Create a WebView that supports bidirectional respondable bridging activities.
-/// To send a message from native to web, call `await javascriptCaller.callJavascript(json)`.
+/// To send a message from native to web, call `await webCaller.callJavascript(json)`.
 /// On the web side, handle that by setting `window["WebNaitveBridge"].nativeToWeb = { ... }`
 /// To send a message from web to native, call `await window["WebNaitveBridge"].webToNative(json)`
 /// On the native side, handle that in `onJavascriptCall`
@@ -22,20 +22,21 @@ public struct WebView: UIViewRepresentable {
   let webToNativeFunctionName: String
   let nativeToWebFunctionName: String
   private var onJavaScriptCall: (Any) async -> [String: Any]?
+  private var webCaller: WebCaller?
 
   public init(
     url: URL?,
     bridgeName: String = "WebNativeBridge",
     webToNativeFunctionName: String = "webToNative",
     nativeToWebFunctionName: String = "nativeToWeb",
-    javascriptCaller: JavascriptCaller?,
+    webCaller: WebCaller?,
     onJavascriptCall: @escaping ((any Sendable) async -> [String: Any]?)) {
       self.url = url
       self.bridgeName = bridgeName
       self.webToNativeFunctionName = webToNativeFunctionName
       self.nativeToWebFunctionName = nativeToWebFunctionName
       self.onJavaScriptCall = onJavascriptCall
-      javascriptCaller?.callJavaScript = callJavaScript
+      self.webCaller = webCaller
   }
   
   // Reference to the coordinator for calling JavaScript from native
@@ -46,6 +47,8 @@ public struct WebView: UIViewRepresentable {
     Task {
       self.coordinator = coordinator
     }
+    webCaller?.callJavaScript = callJavaScript
+    webCaller?.reloadUrl = reloadUrl
     
     let configuration = WKWebViewConfiguration()
     
@@ -64,7 +67,7 @@ public struct WebView: UIViewRepresentable {
     #endif
 
     // Load content
-    if let url = url {
+    if let url {
       let request = URLRequest(url: url)
       webView.load(request)
     }
@@ -78,14 +81,20 @@ public struct WebView: UIViewRepresentable {
     Coordinator(onJavaScriptCall: onJavaScriptCall)
   }
   
-  // call JavaScript from native code
   @MainActor private func callJavaScript(parameters: [String: any Sendable]) async throws -> Any? {
     return try await coordinator?.callJavaScript(js: "return await window.\(bridgeName).\(nativeToWebFunctionName)(data)", parameters: parameters)
   }
+  
+  @MainActor private func reloadUrl(_ url: URL?) -> Void {
+    if let url {
+      coordinator?.webView?.load(URLRequest(url: url))
+    }
+  }
 }
 
-@MainActor public final class JavascriptCaller {
+@MainActor public final class WebCaller {
   public fileprivate(set) var callJavaScript: (@MainActor (_ parameters: [String: any Sendable]) async throws -> (any Sendable)?)? = nil
+  public fileprivate(set) var reloadUrl: (@MainActor (_ url: URL?) -> Void)? = nil
   
   public init() {}
 }

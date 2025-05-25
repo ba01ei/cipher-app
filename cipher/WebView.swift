@@ -58,7 +58,7 @@ public struct WebView: UIViewRepresentable {
     let webView = WKWebView(frame: .zero, configuration: configuration)
     coordinator.webView = webView
     #if DEBUG
-    if #available(iOS 16, macCatalyst 16.4, *) {
+    if #available(iOS 16.4, macCatalyst 16.4, *) {
       webView.isInspectable = true
     }
     #endif

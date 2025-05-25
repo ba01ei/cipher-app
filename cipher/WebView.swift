@@ -10,6 +10,12 @@ import SwiftUI
 import UIKit
 import WebKit
 
+/// Create a WebView that supports bidirectional respondable bridging activities.
+/// To send a message from native to web, call `await javascriptCaller.callJavascript(json)`.
+/// On the web side, handle that by setting `window["WebNaitveBridge"].nativeToWeb = { ... }`
+/// To send a message from web to native, call `await window["WebNaitveBridge"].webToNative(json)`
+/// On the native side, handle that in `onJavascriptCall`
+/// The bridge name (`WebNaitveBridge`) and function names (`webToNative` & `nativeToWeb`) can be customized.
 public struct WebView: UIViewRepresentable {
   let url: URL?
   let bridgeName: String
@@ -17,12 +23,6 @@ public struct WebView: UIViewRepresentable {
   let nativeToWebFunctionName: String
   private var onJavaScriptCall: (Any) async -> [String: Any]?
 
-  /// Create a WebView that supports bidirectional respondable bridging activities.
-  /// - note
-  /// To send a message from native to web, call `await javascriptCaller.callJavascript(json)`.
-  /// On the web side, handle that by setting `window.${bridgeName}.${nativeToWebFuncationName} = { ... }`
-  /// To send a message from web to native, call `await window.${bridgeName}.webToNativeFunctionName(json)`
-  /// On the native side, handle that in `onJavascriptCall`
   public init(
     url: URL?,
     bridgeName: String = "WebNativeBridge",

@@ -8,6 +8,7 @@
 *.playground/xcuserdata/
 *.playground/timeline.xctimeline
 *.playground/playground.xcworkspace/xcuserdata/
+xcshareddata
 
 # Build products
 build/

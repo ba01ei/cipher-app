@@ -17,6 +17,12 @@ struct ContentView: View {
       store.send(MainReducer.Action.bridgeRequestReceived(request))
       return [:]
     }
+    .sheet(item: $store.state.sheet, content: { sheet in
+      switch sheet.detail {
+      case .web(let url):
+        WebView(url: url, javascriptCaller: nil) { _ in return [:] }
+      }
+    })
     .alert(item: $store.state.alert) { alert in
       Alert(title: Text(alert.message))
     }

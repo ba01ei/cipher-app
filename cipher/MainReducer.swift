@@ -5,15 +5,25 @@
 //  Created by Bao Lei on 5/24/25.
 //
 import MiniRedux
+import Foundation
 
 struct AlertContent: Equatable, Sendable, Identifiable {
   let id: String
   let message: String
 }
 
+struct SheetContent: Equatable, Sendable, Identifiable {
+  enum Detail: Equatable, Sendable {
+    case web(URL)
+  }
+  let id: String
+  let detail: Detail
+}
+
 struct MainReducer: Reducer {
   struct State: Equatable, Sendable {
     var alert: AlertContent? = nil
+    var sheet: SheetContent? = nil
   }
   
   enum Action: Sendable {
@@ -58,7 +68,7 @@ struct MainReducer: Reducer {
         return .none
 
       case .openLinkRequested(let openLinkData):
-        state.alert = AlertContent(id: openLinkData.url.absoluteString, message: openLinkData.url.absoluteString)
+        state.sheet = SheetContent(id: openLinkData.url.absoluteString, detail: .web(openLinkData.url))
         return .none
 
       }

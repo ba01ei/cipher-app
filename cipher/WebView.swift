@@ -28,14 +28,14 @@ public struct WebView: UIViewRepresentable {
     bridgeName: String = "WebNativeBridge",
     webToNativeFunctionName: String = "webToNative",
     nativeToWebFunctionName: String = "nativeToWeb",
-    javascriptCaller: JavascriptCaller,
+    javascriptCaller: JavascriptCaller?,
     onJavascriptCall: @escaping ((any Sendable) async -> [String: Any]?)) {
       self.url = url
       self.bridgeName = bridgeName
       self.webToNativeFunctionName = webToNativeFunctionName
       self.nativeToWebFunctionName = nativeToWebFunctionName
       self.onJavaScriptCall = onJavascriptCall
-      javascriptCaller.callJavaScript = callJavaScript
+      javascriptCaller?.callJavaScript = callJavaScript
   }
   
   // Reference to the coordinator for calling JavaScript from native

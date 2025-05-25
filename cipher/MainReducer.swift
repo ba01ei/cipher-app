@@ -15,6 +15,7 @@ struct AlertContent: Equatable, Sendable, Identifiable {
 struct SheetContent: Equatable, Sendable, Identifiable {
   enum Detail: Equatable, Sendable {
     case web(URL)
+    case shareURL(URL)
   }
   let id: String
   let detail: Detail
@@ -30,6 +31,7 @@ struct MainReducer: Reducer {
     case bridgeRequestReceived(any Sendable)
     case presentRequested(PresentData)
     case openLinkRequested(OpenLinkData)
+    case shareLinkTapped(URL)
   }
   
   @MainActor static func store() -> StoreOf<Self> {
@@ -68,7 +70,11 @@ struct MainReducer: Reducer {
         return .none
 
       case .openLinkRequested(let openLinkData):
-        state.sheet = SheetContent(id: openLinkData.url.absoluteString, detail: .web(openLinkData.url))
+        state.sheet = SheetContent(id: "open" + openLinkData.url.absoluteString, detail: .web(openLinkData.url))
+        return .none
+
+      case .shareLinkTapped(let url):
+        state.sheet = SheetContent(id: "share" + url.absoluteString, detail: .shareURL(url))
         return .none
 
       }

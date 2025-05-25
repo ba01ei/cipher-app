@@ -25,6 +25,10 @@ struct ContentView: View {
       switch sheet.detail {
       case .web(let url):
         WebView(url: url, webCaller: nil) { _ in return [:] }
+        
+      case .shareURL(let url):
+        ShareSheet(activityItems: [url], applicationActivities: nil)
+
       }
     })
     .alert(item: $store.state.alert) { alert in
@@ -45,7 +49,9 @@ struct ContentView: View {
         webCaller.reloadUrl?(startingUrl)
       }
       bottomBarButton("Share", "square.and.arrow.up") {
-        
+        if let url = webCaller.currentUrl?() {
+          store.send(.shareLinkTapped(url))
+        }
       }
       bottomBarButton("Quotes", "book") {
         

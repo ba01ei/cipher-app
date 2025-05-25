@@ -49,6 +49,7 @@ public struct WebView: UIViewRepresentable {
     }
     webCaller?.callJavaScript = callJavaScript
     webCaller?.reloadUrl = reloadUrl
+    webCaller?.currentUrl = currentUrl
     
     let configuration = WKWebViewConfiguration()
     
@@ -90,11 +91,16 @@ public struct WebView: UIViewRepresentable {
       coordinator?.webView?.load(URLRequest(url: url))
     }
   }
+  
+  @MainActor private func currentUrl() -> URL? {
+    return coordinator?.webView?.url
+  }
 }
 
 @MainActor public final class WebCaller {
   public fileprivate(set) var callJavaScript: (@MainActor (_ parameters: [String: any Sendable]) async throws -> (any Sendable)?)? = nil
   public fileprivate(set) var reloadUrl: (@MainActor (_ url: URL?) -> Void)? = nil
+  public fileprivate(set) var currentUrl: (@MainActor () -> URL?)? = nil
   
   public init() {}
 }

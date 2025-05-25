@@ -6,18 +6,14 @@
 //
 import MiniRedux
 
-struct SheetContent: Equatable, Sendable, Identifiable {
-  enum SheetType {
-    case alert
-  }
+struct AlertContent: Equatable, Sendable, Identifiable {
   let id: String
-  let type: SheetType
   let message: String
 }
 
 struct MainReducer: Reducer {
   struct State: Equatable, Sendable {
-    var sheet: SheetContent? = nil
+    var alert: AlertContent? = nil
   }
   
   enum Action: Sendable {
@@ -47,12 +43,12 @@ struct MainReducer: Reducer {
         
       case .presentRequested(let message):
         if let message {
-          state.sheet = SheetContent(id: message, type: .alert, message: message)
+          state.alert = AlertContent(id: message, message: message)
         }
         return .none
 
       case .alertDismissTapped:
-        state.sheet = nil
+        state.alert = nil
         return .none
       }
     }

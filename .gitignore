@@ -1,0 +1,14 @@
+# Xcode
+.DS_Store
+*.xcodeproj/*.pbxuser
+*.xcodeproj/*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/
+*.playground/xcuserdata/
+*.playground/timeline.xctimeline
+*.playground/playground.xcworkspace/xcuserdata/
+
+# Build products
+build/
+DerivedData/

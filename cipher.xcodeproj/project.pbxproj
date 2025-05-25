@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		391160E02DE2E2DF006A4D3E /* MiniRedux in Frameworks */ = {isa = PBXBuildFile; productRef = 391160DF2DE2E2DF006A4D3E /* MiniRedux */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		391160BB2DE286D9006A4D3E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				391160E02DE2E2DF006A4D3E /* MiniRedux in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 				391160AC2DE286D7006A4D3E /* cipher */,
 				391160BD2DE286D9006A4D3E /* cipherTests */,
 				391160C72DE286D9006A4D3E /* cipherUITests */,
+				391160DE2DE2E2DF006A4D3E /* Frameworks */,
 				391160AB2DE286D7006A4D3E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +96,13 @@
 				391160C42DE286D9006A4D3E /* cipherUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		391160DE2DE2E2DF006A4D3E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +125,7 @@
 			);
 			name = cipher;
 			packageProductDependencies = (
+				391160DF2DE2E2DF006A4D3E /* MiniRedux */,
 			);
 			productName = cipher;
 			productReference = 391160AA2DE286D7006A4D3E /* cipher.app */;
@@ -195,6 +209,9 @@
 			);
 			mainGroup = 391160A12DE286D7006A4D3E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				391160DD2DE2E2C7006A4D3E /* XCRemoteSwiftPackageReference "swift-mini-redux" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 391160AB2DE286D7006A4D3E /* Products */;
 			projectDirPath = "";
@@ -574,6 +591,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		391160DD2DE2E2C7006A4D3E /* XCRemoteSwiftPackageReference "swift-mini-redux" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ba01ei/swift-mini-redux";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.14;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		391160DF2DE2E2DF006A4D3E /* MiniRedux */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 391160DD2DE2E2C7006A4D3E /* XCRemoteSwiftPackageReference "swift-mini-redux" */;
+			productName = MiniRedux;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 391160A22DE286D7006A4D3E /* Project object */;
 }

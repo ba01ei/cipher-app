@@ -18,8 +18,8 @@ struct MainReducer: Reducer {
   
   enum Action: Sendable {
     case bridgeRequestReceived(any Sendable)
-    case presentRequested(String?)
-    case alertDismissTapped
+    case presentRequested(PresentData)
+    case openLinkRequested(OpenLinkData)
   }
   
   @MainActor static func store() -> StoreOf<Self> {
@@ -31,25 +31,36 @@ struct MainReducer: Reducer {
             return
           }
           do {
-            let incomingRequest = try fromJSON(json, to: IncomingRequest.self)
-            switch incomingRequest.action {
+            guard let actionJson = json["action"] as? String,
+                  let bridgeAction = BridgeAction(rawValue: actionJson),
+                  let dataJson = json["data"] else {
+              print("missing action or data from bridge message: \(json)")
+              return
+            }
+
+            switch bridgeAction {
             case .present:
-              await send(.presentRequested(incomingRequest.data.message))
+              let presentData = try fromJSON(dataJson, to: PresentData.self)
+              await send(.presentRequested(presentData))
+              
+            case .openLink:
+              let openLinkData = try fromJSON(dataJson, to: OpenLinkData.self)
+              await send(.openLinkRequested(openLinkData))
+
             }
           } catch {
             print("error: \(error)")
           }
         }
         
-      case .presentRequested(let message):
-        if let message {
-          state.alert = AlertContent(id: message, message: message)
-        }
+      case .presentRequested(let presentData):
+        state.alert = AlertContent(id: presentData.message, message: presentData.message)
         return .none
 
-      case .alertDismissTapped:
-        state.alert = nil
+      case .openLinkRequested(let openLinkData):
+        state.alert = AlertContent(id: openLinkData.url.absoluteString, message: openLinkData.url.absoluteString)
         return .none
+
       }
     }
   }

@@ -5,15 +5,17 @@
 //  Created by Bao Lei on 5/24/25.
 //
 
+import Foundation
+
 enum BridgeAction: String, Codable, Sendable {
   case present
+  case openLink
 }
 
-struct BridgeData: Codable, Sendable {
-  var message: String?
+struct PresentData: Codable, Sendable {
+  var message: String
 }
 
-struct IncomingRequest: Codable, Sendable {
-  var action: BridgeAction
-  var data: BridgeData
+struct OpenLinkData: Codable, Sendable {
+  var url: URL
 }

@@ -83,7 +83,7 @@ public struct WebView: UIViewRepresentable {
   }
   
   @MainActor private func callJavaScript(parameters: [String: any Sendable]) async throws -> Any? {
-    return try await coordinator?.callJavaScript(js: "return await window.\(bridgeName).\(nativeToWebFunctionName)(data)", parameters: parameters)
+    return try await coordinator?.callJavaScript(js: "return await window.\(bridgeName).\(nativeToWebFunctionName)(data)", parameters: ["data": parameters])
   }
   
   @MainActor private func reloadUrl(_ url: URL?) -> Void {

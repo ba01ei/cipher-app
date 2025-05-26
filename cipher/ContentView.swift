@@ -46,7 +46,13 @@ struct ContentView: View {
   var bottomBar: some View {
     HStack(alignment: .lastTextBaseline) {
       bottomBarButton("New game", "arrow.clockwise") {
-        webCaller.reloadUrl?(startingUrl)
+        Task {
+          do {
+            _ = try await webCaller.callJavaScript?(["action": "startNewGame"])
+          } catch {
+            print("error: \(error)")
+          }
+        }
       }
       bottomBarButton("Share", "square.and.arrow.up") {
         if let url = webCaller.currentUrl?() {

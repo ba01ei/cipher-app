@@ -70,8 +70,8 @@ struct ContentView: View {
   
   func bottomBarButton(_ title: String, _ sfSymbol: String, action: @escaping @MainActor () -> Void) -> some View {
     Button(action: action) {
-      VStack {
-        Image(systemName: sfSymbol)
+      VStack(spacing: 4) {
+        Image(systemName: sfSymbol).font(.system(size: 20))
         Text(title).font(.caption)
       }
     }

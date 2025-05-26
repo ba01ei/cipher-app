@@ -48,7 +48,7 @@ struct ContentView: View {
       bottomBarButton("New game", "arrow.clockwise") {
         Task {
           do {
-            _ = try await webCaller.callJavaScript?(["action": "startNewGame"])
+            _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
           } catch {
             print("error: \(error)")
           }

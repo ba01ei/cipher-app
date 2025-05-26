@@ -21,6 +21,8 @@ struct SheetContent: Equatable, Sendable, Identifiable {
   let detail: Detail
 }
 
+let knownQuotesKey = "known_quotes"
+
 struct MainReducer: Reducer {
   struct State: Equatable, Sendable {
     var alert: AlertContent? = nil
@@ -28,7 +30,6 @@ struct MainReducer: Reducer {
   }
   
   enum Action: Sendable {
-    case bridgeRequestReceived(any Sendable)
     case presentRequested(PresentData)
     case openLinkRequested(OpenLinkData)
     case shareLinkTapped(URL)
@@ -37,34 +38,6 @@ struct MainReducer: Reducer {
   @MainActor static func store() -> StoreOf<Self> {
     Store(initialState: State()) { state, action, _ in
       switch action {
-      case .bridgeRequestReceived(let request):
-        return .run { send in
-          guard let json = request as? [String: Any] else {
-            return
-          }
-          do {
-            guard let actionJson = json["action"] as? String,
-                  let bridgeAction = BridgeAction(rawValue: actionJson),
-                  let dataJson = json["data"] else {
-              print("missing action or data from bridge message: \(json)")
-              return
-            }
-
-            switch bridgeAction {
-            case .present:
-              let presentData = try fromJSON(dataJson, to: PresentData.self)
-              await send(.presentRequested(presentData))
-              
-            case .openLink:
-              let openLinkData = try fromJSON(dataJson, to: OpenLinkData.self)
-              await send(.openLinkRequested(openLinkData))
-
-            }
-          } catch {
-            print("error: \(error)")
-          }
-        }
-        
       case .presentRequested(let presentData):
         state.alert = AlertContent(id: presentData.message, message: presentData.message)
         return .none

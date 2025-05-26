@@ -38,8 +38,7 @@ struct ContentView: View {
 
   var webView: some View {
     WebView(url: startingUrl, webCaller: webCaller) { request in
-      store.send(MainReducer.Action.bridgeRequestReceived(request))
-      return [:]
+      return try await store.handleBridgeRequest(request)
     }
   }
 

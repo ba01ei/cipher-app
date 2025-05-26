@@ -10,12 +10,18 @@ import Foundation
 enum BridgeAction: String, Codable, Sendable {
   case present
   case openLink
+  case appendKnownQuote
+  case requestKnownQuotes
 }
 
 struct PresentData: Codable, Sendable {
-  var message: String
+  let message: String
 }
 
 struct OpenLinkData: Codable, Sendable {
-  var url: URL
+  let url: URL
+}
+
+struct AppendKnownQuoteData: Codable, Sendable {
+  let quote: String
 }

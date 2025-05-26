@@ -39,7 +39,7 @@ public struct WebView: UIViewRepresentable {
   let bridgeName: String
   let webToNativeFunctionName: String
   let nativeToWebFunctionName: String
-  private var onWebRequest: (Any) async -> [String: Any]?
+  private var onWebRequest: (Any) async throws -> [String: Any]?
   private var webCaller: WebCaller?
 
   public init(
@@ -48,7 +48,7 @@ public struct WebView: UIViewRepresentable {
     webToNativeFunctionName: String = "webToNative",
     nativeToWebFunctionName: String = "nativeToWeb",
     webCaller: WebCaller?,
-    onWebRequest: @escaping ((_ webRequest: any Sendable) async -> [String: Any]?)) {
+    onWebRequest: @escaping ((_ webRequest: any Sendable) async throws -> [String: Any]?)) {
       self.url = url
       self.bridgeName = bridgeName
       self.webToNativeFunctionName = webToNativeFunctionName
@@ -129,7 +129,7 @@ extension WebView {
     private var onWebRequest: (_ webRequest: Any) async throws -> [String: any Sendable]?
     weak var webView: WKWebView?
     
-    init(onWebRequest: @escaping (Any) async -> [String: any Sendable]?) {
+    init(onWebRequest: @escaping (Any) async throws -> [String: any Sendable]?) {
       self.onWebRequest = onWebRequest
     }
     
@@ -158,7 +158,7 @@ struct JavaScriptBridge {
   static func setupScript(bridgeName: String, webToNativeFunctionName: String) -> String {
     return """
       window.\(bridgeName) = {
-        \(webToNativeFunctionName): function (data) {
+        \(webToNativeFunctionName): async function (data) {
           return window.webkit.messageHandlers.\(bridgeName).postMessage(data);
         },
       };

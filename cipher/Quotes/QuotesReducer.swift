@@ -5,6 +5,7 @@
 //  Created by Bao Lei on 5/26/25.
 //
 
+import Foundation
 import MiniRedux
 
 struct QuotesReducer: Reducer {
@@ -32,5 +33,18 @@ struct QuotesReducer: Reducer {
 
       }
     }
+  }
+}
+
+extension StoreOf<QuotesReducer> {
+  func urlForQuote(_ quote: String) -> URL? {
+    guard let author = quote.split(separator: "-").last else {
+      return nil
+    }
+    var urlComp = URLComponents(string: "https://en.wikipedia.org/w/index.php")
+    urlComp?.queryItems = [
+      URLQueryItem(name: "search", value: String(author.replacing(" ", with: "+")))
+    ]
+    return urlComp?.url
   }
 }

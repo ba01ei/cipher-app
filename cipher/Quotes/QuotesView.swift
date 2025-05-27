@@ -10,6 +10,7 @@ import SwiftUI
 
 struct QuotesView: View {
   @ObservedObject var store: StoreOf<QuotesReducer>
+  @Environment(\.openURL) var openURL
 
   var body: some View {
     if store.state.quotes.isEmpty {
@@ -25,7 +26,13 @@ struct QuotesView: View {
       List {
         Text("Decoded Quotes").font(.headline) + Text(" — \(store.state.quotes.count)")
         ForEach(store.state.quotes, id: \.self) { quote in
-          Text(quote)
+          Button {
+            if let url = store.urlForQuote(quote) {
+              openURL(url)
+            }
+          } label: {
+            Text(quote)
+          }
         }
       }
     }

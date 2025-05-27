@@ -10,7 +10,7 @@ import MiniRedux
 
 struct QuotesReducer: Reducer {
   struct State: Equatable {
-    var quotes: [String] = []
+    var quotes: [String]?
   }
   
   enum Action {
@@ -26,7 +26,7 @@ struct QuotesReducer: Reducer {
           let quotes: [String] = Storage.value(for: knownQuotesKey) ?? []
           await send(.quotesLoaded(quotes))
         }
-        
+
       case .quotesLoaded(let quotes):
         state.quotes = quotes
         return .none

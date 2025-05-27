@@ -13,7 +13,7 @@ struct QuotesView: View {
   @Environment(\.openURL) var openURL
 
   var body: some View {
-    if store.state.quotes.isEmpty {
+    if store.state.quotes?.isEmpty == true {
       VStack {
         Image(systemName: "text.page.slash").font(.system(size: 26))
           .padding()
@@ -22,10 +22,10 @@ struct QuotesView: View {
           .padding()
         Spacer()
       }
-    } else {
+    } else if let quotes = store.state.quotes {
       List {
-        Text("Decoded Quotes").font(.headline) + Text(" — \(store.state.quotes.count)")
-        ForEach(store.state.quotes, id: \.self) { quote in
+        Text("Decoded Quotes").font(.headline) + Text(" — \(quotes.count)")
+        ForEach(quotes, id: \.self) { quote in
           Button {
             if let url = store.urlForQuote(quote) {
               openURL(url)

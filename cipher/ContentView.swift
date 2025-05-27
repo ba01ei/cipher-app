@@ -16,10 +16,14 @@ struct ContentView: View {
 
   let webCaller = WebCaller()
   var body: some View {
-    VStack(spacing: 0) {
-      webView
-      Color.black.frame(height: 1 / displayScale).frame(maxWidth: .infinity)
-      bottomBar
+    GeometryReader { geometry in
+      VStack(spacing: 0) {
+        webView
+        Color.black.frame(height: 1 / displayScale).frame(maxWidth: .infinity)
+        bottomBar
+          /// for device without bottom safe area inset, add some padding so the bottom bars are not touching the bottom of the screen
+          .padding(.bottom, geometry.safeAreaInsets.bottom > 0 ? 0 : 8)
+      }
     }
     .sheet(item: $store.state.sheet, content: { sheet in
       switch sheet.detail {

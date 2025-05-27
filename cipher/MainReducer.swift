@@ -16,6 +16,7 @@ struct SheetContent: Equatable, Sendable, Identifiable {
   enum Detail: Equatable, Sendable {
     case web(URL)
     case shareURL(URL)
+    case quotes(StoreOf<QuotesReducer>)
   }
   let id: String
   let detail: Detail
@@ -33,6 +34,7 @@ struct MainReducer: Reducer {
     case presentRequested(PresentData)
     case openLinkRequested(OpenLinkData)
     case shareLinkTapped(URL)
+    case quotesTapped
   }
   
   @MainActor static func store() -> StoreOf<Self> {
@@ -48,6 +50,10 @@ struct MainReducer: Reducer {
 
       case .shareLinkTapped(let url):
         state.sheet = SheetContent(id: "share" + url.absoluteString, detail: .shareURL(url))
+        return .none
+
+      case .quotesTapped:
+        state.sheet = SheetContent(id: "quotes", detail: .quotes(QuotesReducer.store()))
         return .none
 
       }

@@ -29,6 +29,9 @@ struct ContentView: View {
       case .shareURL(let url):
         ShareSheet(activityItems: [url], applicationActivities: nil)
 
+      case .quotes(let quotesStore):
+        QuotesView(store: quotesStore)
+
       }
     })
     .alert(item: $store.state.alert) { alert in
@@ -59,7 +62,7 @@ struct ContentView: View {
         }
       }
       bottomBarButton("Quotes", "book") {
-        
+        store.send(.quotesTapped)
       }
       bottomBarButton("Stats", "chart.bar") {
         

@@ -12,6 +12,7 @@ enum BridgeAction: String, Codable, Sendable {
   case openLink
   case appendKnownQuote
   case requestKnownQuotes
+  case solved
 }
 
 struct PresentData: Codable, Sendable {
@@ -24,4 +25,10 @@ struct OpenLinkData: Codable, Sendable {
 
 struct AppendKnownQuoteData: Codable, Sendable {
   let quote: String
+}
+
+struct SolvedData: Codable, Sendable {
+  let timeTaken: Int
+  let hintCount: Int
+  let keyworldResolved: Bool
 }

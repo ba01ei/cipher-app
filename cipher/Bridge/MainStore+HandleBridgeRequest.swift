@@ -39,6 +39,10 @@ extension StoreOf<MainReducer> {
       print("known quotes are \(quotes)")
       return ["quotes": quotes]
 
+    case .solved:
+//      let solvedData = try fromJSON(dataJson, to: SolvedData.self)
+      break
+      
     }
     return [:]
   }

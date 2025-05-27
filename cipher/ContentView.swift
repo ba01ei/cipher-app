@@ -75,7 +75,7 @@ struct ContentView: View {
         Text(title).font(.caption)
       }
     }
-    .foregroundStyle(.black)
+    .foregroundStyle(.primary)
     .padding(.top, 8)
     .frame(maxWidth: .infinity)
   }

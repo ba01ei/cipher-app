@@ -25,6 +25,7 @@ struct ContentView: View {
           .padding(.bottom, geometry.safeAreaInsets.bottom > 0 ? 0 : 8)
       }
     }
+    .ignoresSafeArea(.keyboard, edges: .bottom)
     .sheet(item: $store.state.sheet, content: { sheet in
       switch sheet.detail {
       case .web(let url):

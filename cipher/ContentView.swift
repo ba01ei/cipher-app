@@ -5,6 +5,7 @@
 //  Created by Bao Lei on 5/24/25.
 //
 
+import BridgingWebView
 import MiniRedux
 import SwiftUI
 
@@ -29,7 +30,7 @@ struct ContentView: View {
     .sheet(item: $store.state.sheet, content: { sheet in
       switch sheet.detail {
       case .web(let url):
-        WebView(url: url, webCaller: nil) { _ in return [:] }
+        BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
         
       case .shareURL(let url):
         ShareSheet(activityItems: [url], applicationActivities: nil)
@@ -45,7 +46,7 @@ struct ContentView: View {
   }
 
   var webView: some View {
-    WebView(url: startingUrl, webCaller: webCaller) { request in
+    BridgingWebView(url: startingUrl, webCaller: webCaller) { request in
       return try await store.handleBridgeRequest(request)
     }
   }

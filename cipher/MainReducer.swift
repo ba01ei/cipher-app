@@ -8,8 +8,13 @@ import MiniRedux
 import Foundation
 
 struct AlertContent: Equatable, Sendable, Identifiable {
+  enum AlertType: Equatable, Codable {
+    case message
+    case input
+  }
   let id: String
   let message: String
+  let type: AlertType
 }
 
 struct SheetContent: Equatable, Sendable, Identifiable {
@@ -28,6 +33,7 @@ struct MainReducer: Reducer {
   struct State: Equatable, Sendable {
     var alert: AlertContent? = nil
     var sheet: SheetContent? = nil
+    var alertInputText = ""
   }
   
   enum Action: Sendable {
@@ -35,13 +41,14 @@ struct MainReducer: Reducer {
     case openLinkRequested(OpenLinkData)
     case shareLinkTapped(URL)
     case quotesTapped
+    case joinTapped
   }
   
   @MainActor static func store() -> StoreOf<Self> {
     Store(initialState: State()) { state, action, _ in
       switch action {
       case .presentRequested(let presentData):
-        state.alert = AlertContent(id: presentData.message, message: presentData.message)
+        state.alert = AlertContent(id: presentData.message, message: presentData.message, type: .message)
         return .none
 
       case .openLinkRequested(let openLinkData):
@@ -54,6 +61,10 @@ struct MainReducer: Reducer {
 
       case .quotesTapped:
         state.sheet = SheetContent(id: "quotes", detail: .quotes(QuotesReducer.store()))
+        return .none
+
+      case .joinTapped:
+        state.alert = AlertContent(id: "join", message: "Enter game id", type: .input)
         return .none
 
       }

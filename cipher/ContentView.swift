@@ -40,8 +40,30 @@ struct ContentView: View {
 
       }
     })
-    .alert(item: $store.state.alert) { alert in
-      Alert(title: Text(alert.message))
+    .alert(store.state.alert?.message ?? "", isPresented: Binding(get: {
+      store.state.alert != nil
+    }, set: { shown in
+      if !shown {
+        store.state.alert = nil
+      }
+    })) { [alertId = store.state.alert?.id] in
+      if store.state.alert?.type == .input {
+        TextField("", text: $store.state.alertInputText)
+          .keyboardType(.numberPad)
+      }
+      Button("OK") {
+        if alertId == "join" {
+          let id = store.state.alertInputText.trimmingCharacters(in: .whitespacesAndNewlines)
+          if id.allSatisfy({ $0.isNumber }) {
+            webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.state.alertInputText)")!)
+          } else {
+//            store.state.alert = AlertContent(id: "invalid_input_error", message: "Game id must be a number", type: .message)
+          }
+        }
+      }
+      Button("Cancel", role: .cancel) {
+        store.state.alertInputText = ""
+      }
     }
   }
 
@@ -62,6 +84,11 @@ struct ContentView: View {
           }
         }
       }
+      bottomBarButton("Join", "person.badge.plus") {
+        if let url = webCaller.currentUrl?() {
+          store.send(.joinTapped)
+        }
+      }
       bottomBarButton("Share", "square.and.arrow.up") {
         if let url = webCaller.currentUrl?() {
           store.send(.shareLinkTapped(url))
@@ -70,9 +97,9 @@ struct ContentView: View {
       bottomBarButton("Quotes", "book") {
         store.send(.quotesTapped)
       }
-      bottomBarButton("Stats", "chart.bar") {
-        
-      }
+//      bottomBarButton("Stats", "chart.bar") {
+//        
+//      }
     }
     .frame(maxWidth: .infinity)
   }

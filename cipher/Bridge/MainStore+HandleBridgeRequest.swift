@@ -5,6 +5,7 @@
 //  Created by Bao Lei on 5/25/25.
 //
 
+import Foundation
 import MiniRedux
 
 extension StoreOf<MainReducer> {
@@ -39,10 +40,16 @@ extension StoreOf<MainReducer> {
       print("known quotes are \(quotes)")
       return ["quotes": quotes]
 
-    case .solved:
-//      let solvedData = try fromJSON(dataJson, to: SolvedData.self)
-      break
-      
+    case .finish:
+      var finishData = try fromJSON(dataJson, to: FinishData.self)
+      let now = Date().timeIntervalSince1970
+      finishData.time = now
+      var array: [FinishData] = Storage.value(for: gameResultsKey) ?? []
+      array.removeAll { game in
+        return now - (game.time ?? 0) >= 5 * 24 * 3600
+      }
+      array.insert(finishData, at: 0)
+      Storage.set(array, for: gameResultsKey)
     }
     return [:]
   }

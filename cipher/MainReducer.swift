@@ -32,6 +32,7 @@ enum ErrorType: String, Sendable {
 }
 
 let knownQuotesKey = "known_quotes"
+let gameResultsKey = "game_results"
 
 struct MainReducer: Reducer {
   struct State: Equatable, Sendable {

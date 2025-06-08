@@ -58,6 +58,7 @@ struct ContentView: View {
             webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.state.alertInputText)")!)
           } else {
 //            store.state.alert = AlertContent(id: "invalid_input_error", message: "Game id must be a number", type: .message)
+            store.send(.errorOccurred(.invalidGameId))
           }
         }
       }

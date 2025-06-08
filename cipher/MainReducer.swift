@@ -27,6 +27,10 @@ struct SheetContent: Equatable, Sendable, Identifiable {
   let detail: Detail
 }
 
+enum ErrorType: String, Sendable {
+  case invalidGameId
+}
+
 let knownQuotesKey = "known_quotes"
 
 struct MainReducer: Reducer {
@@ -42,6 +46,7 @@ struct MainReducer: Reducer {
     case shareLinkTapped(URL)
     case quotesTapped
     case joinTapped
+    case errorOccurred(ErrorType)
   }
   
   @MainActor static func store() -> StoreOf<Self> {
@@ -67,6 +72,15 @@ struct MainReducer: Reducer {
         state.alert = AlertContent(id: "join", message: "Enter game id", type: .input)
         return .none
 
+      case .errorOccurred(let error):
+        switch error {
+        case .invalidGameId:
+          state.alert = nil
+          return .run { send in
+            try? await Task.sleep(for: .milliseconds(300))
+            await send(.presentRequested(PresentData(message: "Game id must be a number")))
+          }
+        }
       }
     }
   }

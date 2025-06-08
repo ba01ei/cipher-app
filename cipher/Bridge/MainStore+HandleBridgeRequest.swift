@@ -45,9 +45,6 @@ extension StoreOf<MainReducer> {
       let now = Date().timeIntervalSince1970
       finishData.time = now
       var array: [FinishData] = Storage.value(for: gameResultsKey) ?? []
-      array.removeAll { game in
-        return now - (game.time ?? 0) >= 5 * 24 * 3600
-      }
       array.insert(finishData, at: 0)
       Storage.set(array, for: gameResultsKey)
     }

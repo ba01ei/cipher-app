@@ -23,13 +23,12 @@ struct GameLogView: View {
       }
     } else if let games = store.state.games {
       List {
-        Text("Recent Games").font(.headline) + Text(" — \(games.count)")
-        ForEach(games, id: \.uuid) { game in
-          Button {
-            
-          } label: {
-            Text(game.uuid)
-          }
+        Text("Game Log").font(.headline)
+        ForEach(games) { game in
+          Text(game.id)
+            .onTapGesture {
+              print("tapped")
+            }
         }
       }
     }

@@ -27,11 +27,15 @@ struct AppendKnownQuoteData: Codable, Sendable {
   let quote: String
 }
 
-struct FinishData: Codable, Equatable, Sendable {
+struct FinishData: Codable, Equatable, Identifiable, Sendable {
   let uuid: String
   let success: Bool
   let timeTaken: Int
   let hintCount: Int
   let keywordRevealed: Bool
   var time: TimeInterval?
+  
+  var id: String {
+    uuid.replacingOccurrences(of: "cipher-", with: "")
+  }
 }

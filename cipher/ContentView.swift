@@ -38,6 +38,9 @@ struct ContentView: View {
       case .quotes(let quotesStore):
         QuotesView(store: quotesStore)
 
+      case .gameLog(let gameLogStore):
+        GameLogView(store: gameLogStore)
+
       }
     })
     .alert(store.state.alert?.message ?? "", isPresented: Binding(get: {
@@ -57,20 +60,26 @@ struct ContentView: View {
           if id.allSatisfy({ $0.isNumber }) {
             webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.state.alertInputText)")!)
           } else {
-//            store.state.alert = AlertContent(id: "invalid_input_error", message: "Game id must be a number", type: .message)
             store.send(.errorOccurred(.invalidGameId))
           }
         }
       }
-      Button("Cancel", role: .cancel) {
-        store.state.alertInputText = ""
+      if store.state.alert?.type == .input {
+        Button("Cancel", role: .cancel) {
+          store.state.alertInputText = ""
+        }
       }
     }
   }
 
   var webView: some View {
     BridgingWebView(url: startingUrl, webCaller: webCaller) { request in
-      return try await store.handleBridgeRequest(request)
+      do {
+        return try await store.handleBridgeRequest(request)
+      } catch {
+        assertionFailure("Bridge error: \(error)")
+        return [:]
+      }
     }
   }
 
@@ -86,9 +95,7 @@ struct ContentView: View {
         }
       }
       bottomBarButton("Join", "person.badge.plus") {
-        if let url = webCaller.currentUrl?() {
-          store.send(.joinTapped)
-        }
+        store.send(.joinTapped)
       }
       bottomBarButton("Share", "square.and.arrow.up") {
         if let url = webCaller.currentUrl?() {
@@ -98,9 +105,9 @@ struct ContentView: View {
       bottomBarButton("Quotes", "book") {
         store.send(.quotesTapped)
       }
-//      bottomBarButton("Stats", "chart.bar") {
-//        
-//      }
+      bottomBarButton("Games", "chart.bar") {
+        store.send(.gameLogTapped)
+      }
     }
     .frame(maxWidth: .infinity)
   }

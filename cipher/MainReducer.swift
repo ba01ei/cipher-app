@@ -22,6 +22,7 @@ struct SheetContent: Equatable, Sendable, Identifiable {
     case web(URL)
     case shareURL(URL)
     case quotes(StoreOf<QuotesReducer>)
+    case gameLog(StoreOf<GameLogReducer>)
   }
   let id: String
   let detail: Detail
@@ -47,6 +48,7 @@ struct MainReducer: Reducer {
     case shareLinkTapped(URL)
     case quotesTapped
     case joinTapped
+    case gameLogTapped
     case errorOccurred(ErrorType)
   }
   
@@ -82,6 +84,11 @@ struct MainReducer: Reducer {
             await send(.presentRequested(PresentData(message: "Game id must be a number")))
           }
         }
+        
+      case .gameLogTapped:
+        state.sheet = SheetContent(id: "gameLog", detail: .gameLog(GameLogReducer.store()))
+        return .none
+        
       }
     }
   }

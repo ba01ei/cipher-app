@@ -27,7 +27,7 @@ struct AppendKnownQuoteData: Codable, Sendable {
   let quote: String
 }
 
-struct FinishData: Codable, Sendable {
+struct FinishData: Codable, Equatable, Sendable {
   let uuid: String
   let success: Bool
   let timeTaken: Int

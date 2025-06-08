@@ -43,7 +43,7 @@ extension StoreOf<QuotesReducer> {
     }
     var urlComp = URLComponents(string: "https://en.wikipedia.org/w/index.php")
     urlComp?.queryItems = [
-      URLQueryItem(name: "search", value: String(author.replacing(" ", with: "+")))
+      URLQueryItem(name: "search", value: String(author).removingParentheses().replacing(" ", with: "+"))
     ]
     return urlComp?.url
   }

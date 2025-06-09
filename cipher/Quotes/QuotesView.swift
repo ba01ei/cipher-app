@@ -32,6 +32,7 @@ struct QuotesView: View {
             }
           } label: {
             Text(quote)
+              .foregroundStyle(Color.primary)
           }
         }
       }

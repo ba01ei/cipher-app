@@ -25,10 +25,36 @@ struct GameLogView: View {
       List {
         Text("Game Log").font(.headline)
         ForEach(games) { game in
-          Text(game.id)
-            .onTapGesture {
-              print("tapped")
+          HStack {
+            Image(systemName: game.success ? "trophy.circle.fill" : "xmark.circle.fill")
+              .font(.system(size: 20))
+              .foregroundStyle(game.success ? Color.green : Color.red)
+            VStack {
+              Text(game.id)
+              if let time = game.time {
+                Text(time.formatted)
+                  .foregroundStyle(Color.secondary)
+                  .font(.caption)
+              }
             }
+            Spacer()
+            VStack {
+              Text("\(game.timeTaken) sec")
+              if game.hintCount > 0 {
+                Text("\(game.hintCount) hint(s)")
+                  .foregroundStyle(Color.secondary)
+                  .font(.caption)
+              }
+              if game.keywordRevealed {
+                Text("Used keyword reveal")
+                  .foregroundStyle(Color.secondary)
+                  .font(.caption)
+              }
+            }
+          }
+          .onTapGesture {
+            print("tapped")
+          }
         }
       }
     }

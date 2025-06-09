@@ -23,7 +23,12 @@ struct QuotesReducer: Reducer {
       switch action {
       case .initialized:
         return .run { send in
-          let quotes: [String] = Storage.value(for: knownQuotesKey) ?? []
+          var quotes: [String] = Storage.value(for: knownQuotesKey) ?? []
+          let set = NSOrderedSet(array: quotes)
+          if set.count != quotes.count, let deduped = set.array as? [String] {
+            Storage.set(deduped, for: knownQuotesKey)
+            quotes = deduped
+          }
           await send(.quotesLoaded(quotes))
         }
 

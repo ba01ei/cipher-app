@@ -15,7 +15,8 @@ struct ContentView: View {
   @ObservedObject var store = MainReducer.store()
   @Environment(\.displayScale) var displayScale
 
-  let webCaller = WebCaller()
+  let webCaller: WebCaller
+
   var body: some View {
     GeometryReader { geometry in
       VStack(spacing: 0) {
@@ -125,6 +126,3 @@ struct ContentView: View {
   }
 }
 
-#Preview {
-  ContentView()
-}

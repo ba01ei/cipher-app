@@ -6,12 +6,21 @@
 //
 
 import SwiftUI
+import BridgingWebView
 
 @main
 struct cipherApp: App {
+  let webCaller = WebCaller()
   var body: some Scene {
     WindowGroup {
-      ContentView()
+      ContentView(webCaller: webCaller)
+        .onOpenURL { url in
+          // Handle universal links here
+          Task {
+            try? await Task.sleep(for: .milliseconds(500))
+            webCaller.reloadUrl?(url)
+          }
+        }
     }
   }
 }

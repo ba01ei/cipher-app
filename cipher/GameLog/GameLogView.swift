@@ -17,7 +17,7 @@ struct GameLogView: View {
         Image(systemName: "circle.slash").font(.system(size: 26))
           .padding()
         
-        Text("No games in the last 5 days.")
+        Text("No games yet.")
           .padding()
         Spacer()
       }

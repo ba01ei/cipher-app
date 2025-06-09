@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Group 10.png",
+      "filename" : "cipherIconLight.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "Group 11.png",
+      "filename" : "cipherIconDark.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

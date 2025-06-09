@@ -9,6 +9,7 @@ struct GameLogReducer: Reducer {
   enum Action {
     case initialized
     case gamesLoaded([FinishData])
+    case tapped(FinishData)
   }
   
   @MainActor static func store() -> StoreOf<Self> {
@@ -22,6 +23,10 @@ struct GameLogReducer: Reducer {
 
       case .gamesLoaded(let games):
         state.games = games
+        return .none
+
+      case .tapped:
+        // delegated to parent
         return .none
 
       }

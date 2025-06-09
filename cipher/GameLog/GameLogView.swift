@@ -52,8 +52,9 @@ struct GameLogView: View {
               }
             }
           }
+          .contentShape(Rectangle())
           .onTapGesture {
-            print("tapped")
+            store.send(.tapped(game))
           }
         }
       }

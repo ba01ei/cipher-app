@@ -50,10 +50,12 @@ struct MainReducer: Reducer {
     case joinTapped
     case gameLogTapped
     case errorOccurred(ErrorType)
+    
+    case gameLog(GameLogReducer.Action)
   }
   
   @MainActor static func store() -> StoreOf<Self> {
-    Store(initialState: State()) { state, action, _ in
+    Store(initialState: State()) { state, action, send in
       switch action {
       case .presentRequested(let presentData):
         state.alert = AlertContent(id: presentData.message, message: presentData.message, type: .message)
@@ -86,7 +88,26 @@ struct MainReducer: Reducer {
         }
         
       case .gameLogTapped:
-        state.sheet = SheetContent(id: "gameLog", detail: .gameLog(GameLogReducer.store()))
+        state.sheet = SheetContent(id: "gameLog", detail: .gameLog(GameLogReducer.store().delegate({ childAction in
+          send(.gameLog(childAction))
+        })))
+        return .none
+
+      case .gameLog(let gameLogAction):
+        switch gameLogAction {
+        case .tapped(let game):
+          state.sheet = nil
+          if let time = game.time, Date().timeIntervalSince1970 - time <= 6 * 24 * 3600 {
+            state.sheet = SheetContent(id: "game\(game.uuid)", detail: .web(URL(string: "https://cipherresult.val.run/?id=\(game.uuid)")!))
+          } else {
+            return .run { send in
+              await send(.presentRequested(PresentData(message: "The game is no long available.")))
+            }
+          }
+
+        default:
+          break
+        }
         return .none
         
       }

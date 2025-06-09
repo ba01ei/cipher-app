@@ -74,7 +74,7 @@ struct MainReducer: Reducer {
         return .none
 
       case .joinTapped:
-        state.alert = AlertContent(id: "join", message: "Enter game id", type: .input)
+        state.alert = AlertContent(id: "join", message: "Enter Game ID", type: .input)
         return .none
 
       case .errorOccurred(let error):
@@ -83,7 +83,7 @@ struct MainReducer: Reducer {
           state.alert = nil
           return .run { send in
             try? await Task.sleep(for: .milliseconds(300))
-            await send(.presentRequested(PresentData(message: "Game id must be a number")))
+            await send(.presentRequested(PresentData(message: "Game ID must be a number")))
           }
         }
         

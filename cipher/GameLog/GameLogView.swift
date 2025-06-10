@@ -29,7 +29,7 @@ struct GameLogView: View {
             Image(systemName: game.success ? "trophy.circle.fill" : "xmark.circle.fill")
               .font(.system(size: 20))
               .foregroundStyle(game.success ? Color.green : Color.red)
-            VStack {
+            VStack(alignment: .leading) {
               Text(game.id)
               if let time = game.time {
                 Text(time.formatted)
@@ -38,10 +38,10 @@ struct GameLogView: View {
               }
             }
             Spacer()
-            VStack {
+            VStack(alignment: .trailing) {
               Text("\(game.timeTaken) sec")
               if game.hintCount > 0 {
-                Text("\(game.hintCount) hint(s)")
+                Text("\(game.hintCount) hint\(game.hintCount == 1 ? "" : "s")")
                   .foregroundStyle(Color.secondary)
                   .font(.caption)
               }
@@ -60,4 +60,8 @@ struct GameLogView: View {
       }
     }
   }
+}
+
+#Preview {
+  GameLogView(store: GameLogReducer.store())
 }

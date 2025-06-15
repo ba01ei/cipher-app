@@ -31,9 +31,13 @@ extension StoreOf<MainReducer> {
       
     case .appendKnownQuote:
       let newQuote = try fromJSON(dataJson, to: AppendKnownQuoteData.self)
-      var array: [String] = Storage.value(for: knownQuotesKey) ?? []
-      array.insert(newQuote.quote, at: 0)
-      Storage.set(array, for: knownQuotesKey)
+      var array: [Quote]? = Storage.value(for: knownQuotesKey)
+      if array == nil {
+        let stringArray: [String]? = Storage.value(for: knownQuotesKey)
+        array = stringArray?.map(\.toQuote) ?? []
+      }
+      array?.insert(newQuote.quote.toQuote, at: 0)
+      Storage.set(array ?? [], for: knownQuotesKey)
       
     case .requestKnownQuotes:
       let quotes: [String] = Storage.value(for: knownQuotesKey) ?? []

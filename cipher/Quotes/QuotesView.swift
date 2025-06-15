@@ -22,18 +22,24 @@ struct QuotesView: View {
           .padding()
         Spacer()
       }
-    } else if let quotes = store.state.quotes {
+    } else if !store.state.notDeleted.isEmpty {
       List {
-        Text("Decoded Quotes").font(.headline) + Text(" — \(quotes.count)")
-        ForEach(quotes, id: \.self) { quote in
-          Button {
-            if let url = store.urlForQuote(quote) {
-              openURL(url)
-            }
-          } label: {
-            Text(quote)
-              .foregroundStyle(Color.primary)
+        Text("Decoded Quotes").font(.headline) + Text(" — \(store.state.notDeleted.count)")
+        ForEach(store.state.notDeleted, id: \.text) { quote in
+          VStack {
+            Text(quote.text).foregroundStyle(Color.primary) + Text(" - ") + Text(quote.by).foregroundColor(.secondary)
           }
+            .onTapGesture {
+              if let url = store.urlForQuote(quote) {
+                openURL(url)
+              }
+            }
+            .swipeActions {
+              Button("Delete", role: .destructive) {
+                store.send(.deleteQuote(quote))
+              }
+              .tint(.red)
+            }
         }
       }
     }

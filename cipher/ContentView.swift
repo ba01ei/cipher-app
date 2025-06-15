@@ -63,6 +63,7 @@ struct ContentView: View {
           } else {
             store.send(.errorOccurred(.invalidGameId))
           }
+          store.state.alertInputText = ""
         }
       }
       if store.state.alert?.type == .input {

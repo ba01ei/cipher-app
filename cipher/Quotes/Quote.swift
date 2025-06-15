@@ -21,6 +21,10 @@ struct Quote: Codable, Equatable {
       by = split.last?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     }
   }
+  
+  var toText: String {
+    return "\(text) - \(by)"
+  }
 }
 
 extension String {

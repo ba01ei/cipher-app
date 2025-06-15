@@ -40,9 +40,8 @@ extension StoreOf<MainReducer> {
       Storage.set(array ?? [], for: knownQuotesKey)
       
     case .requestKnownQuotes:
-      let quotes: [String] = Storage.value(for: knownQuotesKey) ?? []
-      print("known quotes are \(quotes)")
-      return ["quotes": quotes]
+      let quotes: [Quote] = Storage.value(for: knownQuotesKey) ?? []
+      return ["quotes": quotes.map(\.toText)]
 
     case .finish:
       var finishData = try fromJSON(dataJson, to: FinishData.self)

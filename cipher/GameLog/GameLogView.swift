@@ -23,7 +23,16 @@ struct GameLogView: View {
       }
     } else if let games = store.state.games {
       List {
-        Text("Game Log").font(.headline)
+        HStack {
+          Text("Game Log").font(.headline)
+          Spacer()
+#if targetEnvironment(macCatalyst)
+          Button { store.send(.closeTapped) } label: {
+            Image(systemName: "xmark.circle")
+              .font(.title)
+          }
+#endif
+        }
         ForEach(games) { game in
           HStack {
             Image(systemName: game.success ? "trophy.circle.fill" : "xmark.circle.fill")

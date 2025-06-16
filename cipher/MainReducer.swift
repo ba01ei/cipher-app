@@ -51,6 +51,7 @@ struct MainReducer: Reducer {
     case gameLogTapped
     case errorOccurred(ErrorType)
     
+    case quotes(QuotesReducer.Action)
     case gameLog(GameLogReducer.Action)
   }
   
@@ -70,7 +71,9 @@ struct MainReducer: Reducer {
         return .none
 
       case .quotesTapped:
-        state.sheet = SheetContent(id: "quotes", detail: .quotes(QuotesReducer.store()))
+        state.sheet = SheetContent(id: "quotes", detail: .quotes(QuotesReducer.store().delegate({ childAction in
+          send(.quotes(childAction))
+        })))
         return .none
 
       case .joinTapped:
@@ -92,6 +95,16 @@ struct MainReducer: Reducer {
           send(.gameLog(childAction))
         })))
         return .none
+        
+      case .quotes(let quotesAction):
+        switch quotesAction {
+        case .closeTapped:
+          state.sheet = nil
+          return .none
+          
+        default:
+          return .none
+        }
 
       case .gameLog(let gameLogAction):
         switch gameLogAction {
@@ -104,6 +117,9 @@ struct MainReducer: Reducer {
               await send(.presentRequested(PresentData(message: "The game is no long available.")))
             }
           }
+          
+        case .closeTapped:
+          state.sheet = nil
 
         default:
           break

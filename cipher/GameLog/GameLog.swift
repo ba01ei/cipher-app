@@ -10,6 +10,7 @@ struct GameLogReducer: Reducer {
     case initialized
     case gamesLoaded([FinishData])
     case tapped(FinishData)
+    case closeTapped
   }
   
   @MainActor static func store() -> StoreOf<Self> {
@@ -25,7 +26,7 @@ struct GameLogReducer: Reducer {
         state.games = games
         return .none
 
-      case .tapped:
+      case .tapped, .closeTapped:
         // delegated to parent
         return .none
 

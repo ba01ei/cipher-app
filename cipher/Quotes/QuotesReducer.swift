@@ -22,6 +22,7 @@ struct QuotesReducer: Reducer {
     case initialized
     case quotesLoaded([Quote])
     case deleteQuote(Quote)
+    case closeTapped
   }
   
   @MainActor static func store() -> StoreOf<Self> {
@@ -55,6 +56,10 @@ struct QuotesReducer: Reducer {
         Storage.set(state.quotes ?? [], for: knownQuotesKey)
         return .none
 
+      case .closeTapped:
+        // delegated
+        return .none
+        
       }
     }
   }

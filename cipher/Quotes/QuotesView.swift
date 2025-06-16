@@ -24,7 +24,16 @@ struct QuotesView: View {
       }
     } else if !store.state.notDeleted.isEmpty {
       List {
-        Text("Decoded Quotes").font(.headline) + Text(" — \(store.state.notDeleted.count)")
+        HStack {
+          Text("Decoded Quotes").font(.headline) + Text(" — \(store.state.notDeleted.count)")
+          Spacer()
+#if targetEnvironment(macCatalyst)
+          Button { store.send(.closeTapped) } label: {
+            Image(systemName: "xmark.circle")
+              .font(.title)
+          }
+#endif
+        }
         ForEach(store.state.notDeleted, id: \.text) { quote in
           VStack {
             Text(quote.text).foregroundStyle(Color.primary) + Text(" - " + quote.by).foregroundColor(.secondary)

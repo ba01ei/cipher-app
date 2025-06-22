@@ -90,10 +90,15 @@ struct ContentView: View {
       bottomBarButton("New game", "arrow.clockwise") {
         Task {
           do {
-            _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
+            let aliveResult = try await webCaller.sendMessageToWeb?(["action": "alive"]) as? [String: Any]
+            if (aliveResult?["result"] as? Bool) == true {
+              _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
+              return
+            }
           } catch {
             print("error: \(error)")
           }
+          webCaller.reloadUrl?(startingUrl)
         }
       }
       bottomBarButton("Join", "person.badge.plus") {

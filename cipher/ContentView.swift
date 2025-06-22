@@ -31,7 +31,16 @@ struct ContentView: View {
     .sheet(item: $store.state.sheet, content: { sheet in
       switch sheet.detail {
       case .web(let url):
-        BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
+        ZStack(alignment: .topTrailing) {
+          BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
+          #if targetEnvironment(macCatalyst)
+                    Button { store.send(.closeSheetTapped) } label: {
+                      Image(systemName: "xmark.circle")
+                        .font(.title3)
+                        .padding(10)
+                    }
+          #endif
+        }
         
       case .shareURL(let url):
         ShareSheet(activityItems: [url], applicationActivities: nil)

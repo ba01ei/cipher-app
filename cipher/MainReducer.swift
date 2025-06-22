@@ -50,6 +50,7 @@ struct MainReducer: Reducer {
     case joinTapped
     case gameLogTapped
     case errorOccurred(ErrorType)
+    case closeSheetTapped
     
     case quotes(QuotesReducer.Action)
     case gameLog(GameLogReducer.Action)
@@ -96,6 +97,10 @@ struct MainReducer: Reducer {
         })))
         return .none
         
+      case .closeSheetTapped:
+        state.sheet = nil
+        return .none
+
       case .quotes(let quotesAction):
         switch quotesAction {
         case .closeTapped:

@@ -31,11 +31,11 @@ struct ContentView: View {
     .sheet(item: $store.state.sheet, content: { sheet in
       switch sheet.detail {
       case .web(let url):
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .topLeading) {
           BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
           #if targetEnvironment(macCatalyst)
                     Button { store.send(.closeSheetTapped) } label: {
-                      Image(systemName: "xmark.circle")
+                      Image(systemName: "x.circle.fill")
                         .font(.title3)
                         .padding(10)
                     }

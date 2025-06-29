@@ -33,6 +33,9 @@ struct GameLogView: View {
           }
 #endif
         }
+        if let gameCenterStore = store.state.gameCenter {
+          GameCenterView(store: gameCenterStore)
+        }
         ForEach(games) { game in
           HStack {
             Image(systemName: game.success ? "trophy.circle.fill" : "xmark.circle.fill")
@@ -69,8 +72,4 @@ struct GameLogView: View {
       }
     }
   }
-}
-
-#Preview {
-  GameLogView(store: GameLogReducer.store())
 }

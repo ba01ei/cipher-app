@@ -4,6 +4,7 @@ import MiniRedux
 struct GameLogReducer: Reducer {
   struct State: Equatable {
     var games: [FinishData]?
+    var gameCenter: StoreOf<GameCenter>?
   }
   
   enum Action {
@@ -13,8 +14,8 @@ struct GameLogReducer: Reducer {
     case closeTapped
   }
   
-  @MainActor static func store() -> StoreOf<Self> {
-    return Store(initialState: State(), initialAction: .initialized) { state, action, _ in
+  @MainActor static func store(gameCenter: StoreOf<GameCenter>?) -> StoreOf<Self> {
+    return Store(initialState: State(gameCenter: gameCenter), initialAction: .initialized) { state, action, _ in
       switch action {
       case .initialized:
         return .run { send in

@@ -615,7 +615,7 @@
 			repositoryURL = "https://github.com/ba01ei/swift-mini-redux";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.14;
+				minimumVersion = 0.0.15;
 			};
 		};
 		39C591742DF0C29600B72F93 /* XCRemoteSwiftPackageReference "swift-bridging-webview" */ = {

@@ -1,5 +1,6 @@
 import Foundation
 import MiniRedux
+import GameKit
 
 struct GameLogReducer: Reducer {
   struct State: Equatable {
@@ -25,7 +26,24 @@ struct GameLogReducer: Reducer {
 
       case .gamesLoaded(let games):
         state.games = games
-        return .none
+
+        if state.gameCenter?.state.isAuthenticated == true {
+          return .run { _ in
+            let achievements = AchievementsHelper.achievements(from: games).map {
+              let achievement = GKAchievement(identifier: $0.rawValue)
+              achievement.percentComplete = 100.0
+              achievement.showsCompletionBanner = true
+              return achievement
+            }
+            GKAchievement.report(achievements) { error in
+              if let error {
+                print("Error reporting achievement: \(error.localizedDescription)")
+              }
+            }
+          }
+        } else {
+          return .none
+        }
 
       case .tapped, .closeTapped:
         // delegated to parent

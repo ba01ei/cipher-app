@@ -12,12 +12,12 @@ struct Quote: Codable, Equatable {
   
   init(string: String) {
     deleted = false
-    let split = string.split(separator: "-")
+    let split = string.split(separator: " - ")
     if split.count == 1 {
       text = string
       by = ""
     } else {
-      text = split[0..<split.count - 1].joined(separator: "-").trimmingCharacters(in: .whitespacesAndNewlines)
+      text = split[0..<split.count - 1].joined(separator: " - ").trimmingCharacters(in: .whitespacesAndNewlines)
       by = split.last?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     }
   }

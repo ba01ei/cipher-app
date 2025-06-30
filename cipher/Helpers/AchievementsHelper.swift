@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import GameKit
 
 enum Achievement: String {
   case firstSolve = "fyi.lei.cipher.firstsolve"
@@ -49,5 +50,19 @@ struct AchievementsHelper {
       }
     }
     return result
+  }
+  
+  static func reportAchievements(from games: [FinishData]) {
+    let achievements = AchievementsHelper.achievements(from: games).map {
+      let achievement = GKAchievement(identifier: $0.rawValue)
+      achievement.percentComplete = 100.0
+      achievement.showsCompletionBanner = true
+      return achievement
+    }
+    GKAchievement.report(achievements) { error in
+      if let error {
+        print("Error reporting achievement: \(error.localizedDescription)")
+      }
+    }
   }
 }

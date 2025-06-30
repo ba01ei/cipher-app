@@ -7,6 +7,7 @@
 
 import Foundation
 import MiniRedux
+import GameKit
 
 extension StoreOf<MainReducer> {
   func handleBridgeRequest(_ request: any Sendable) async throws -> [String: any Sendable] {
@@ -49,6 +50,10 @@ extension StoreOf<MainReducer> {
       finishData.time = now
       var array: [FinishData] = Storage.value(for: gameResultsKey) ?? []
       array.insert(finishData, at: 0)
+      // this is the full array, we can check for achievements
+      if GKLocalPlayer.local.isAuthenticated {
+        AchievementsHelper.reportAchievements(from: array)
+      }
       Storage.set(array, for: gameResultsKey)
     }
     return [:]

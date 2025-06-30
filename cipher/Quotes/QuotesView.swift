@@ -31,6 +31,7 @@ struct QuotesView: View {
           Button { store.send(.closeTapped) } label: {
             Image(systemName: "xmark.circle")
               .font(.title)
+              .tint(.primary)
           }
 #endif
         }

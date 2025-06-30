@@ -24,6 +24,7 @@ struct SheetContent: Equatable, Sendable, Identifiable {
     case quotes(StoreOf<QuotesReducer>)
     case gameLog(StoreOf<GameLogReducer>)
     case gameCenterAchievements
+    case gameCenterAuth
   }
   let id: String
   let detail: Detail
@@ -155,6 +156,11 @@ struct MainReducer: Reducer {
         case .achievementsTapped:
           state.sheet = nil
           state.bigSheet = SheetContent(id: "gameCenterAchievements", detail: .gameCenterAchievements)
+          return .none
+          
+        case .authTapped:
+          state.sheet = nil
+          state.bigSheet = SheetContent(id: "gameCenterAuth", detail: .gameCenterAuth)
           return .none
           
         default:

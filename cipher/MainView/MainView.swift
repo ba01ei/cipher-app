@@ -127,13 +127,12 @@ struct ContentView: View {
     case .web(let url):
       ZStack(alignment: .topLeading) {
         BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
-        #if targetEnvironment(macCatalyst)
         Button { store.send(.closeSheetTapped) } label: {
           Image(systemName: "x.circle.fill")
             .font(.title3)
+            .tint(.primary)
             .padding(10)
         }
-        #endif
       }
       
     case .shareURL(let url):
@@ -149,6 +148,21 @@ struct ContentView: View {
       GameCenterContainerView(gameCenterVC: GKGameCenterViewController(state: .achievements)) {
         store.send(.closeSheetTapped)
       }
+      
+    case .gameCenterAuth:
+      if let vc = store.state.gameCenter?.state.authViewController {
+        GameCenterContainerView(gameCenterVC: vc) {
+          store.send(.closeSheetTapped)
+        }
+      } else {
+        VStack {
+          Text("Sorry, something went wrong and Game Center is not available")
+          Button("Close") {
+            store.send(.closeSheetTapped)
+          }
+        }
+      }
+      
     }
   }
 }

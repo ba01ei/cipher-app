@@ -15,6 +15,9 @@ struct GameCenter: Reducer {
     var isAuthenticated = false
     var authViewController: UIViewController?
     var error: String?
+    var canShowGameCenter: Bool {
+      return isAuthenticated || (authViewController != nil)
+    }
   }
   
   enum Action {

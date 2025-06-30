@@ -30,10 +30,11 @@ struct GameLogView: View {
           Button { store.send(.closeTapped) } label: {
             Image(systemName: "xmark.circle")
               .font(.title)
+              .tint(.primary)
           }
 #endif
         }
-        if let gameCenterStore = store.state.gameCenter {
+        if let gameCenterStore = store.state.gameCenter, gameCenterStore.state.canShowGameCenter {
           GameCenterView(store: gameCenterStore)
         }
         ForEach(games) { game in

@@ -128,10 +128,7 @@ struct ContentView: View {
       ZStack(alignment: .topLeading) {
         BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
         Button { store.send(.closeSheetTapped) } label: {
-          Image(systemName: "x.circle.fill")
-            .font(.title3)
-            .tint(.primary)
-            .padding(10)
+          Close()
         }
       }
       

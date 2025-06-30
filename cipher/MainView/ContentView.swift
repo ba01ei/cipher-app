@@ -30,33 +30,10 @@ struct ContentView: View {
     }
     .ignoresSafeArea(.keyboard, edges: .bottom)
     .sheet(item: $store.state.sheet, content: { sheet in
-      switch sheet.detail {
-      case .web(let url):
-        ZStack(alignment: .topLeading) {
-          BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
-          #if targetEnvironment(macCatalyst)
-                    Button { store.send(.closeSheetTapped) } label: {
-                      Image(systemName: "x.circle.fill")
-                        .font(.title3)
-                        .padding(10)
-                    }
-          #endif
-        }
-        
-      case .shareURL(let url):
-        ShareSheet(activityItems: [url], applicationActivities: nil)
-
-      case .quotes(let quotesStore):
-        QuotesView(store: quotesStore)
-
-      case .gameLog(let gameLogStore):
-        GameLogView(store: gameLogStore)
-
-      case .gameCenterAchievements:
-        GameCenterContainerView(gameCenterVC: GKGameCenterViewController(state: .achievements)) {
-          store.send(.closeSheetTapped)
-        }
-      }
+      sheetView(sheet)
+    })
+    .fullScreenCover(item: $store.state.bigSheet, content: { sheet in
+      sheetView(sheet)
     })
     .alert(store.state.alert?.message ?? "", isPresented: Binding(get: {
       store.state.alert != nil
@@ -143,6 +120,36 @@ struct ContentView: View {
     .foregroundStyle(.primary)
     .padding(.top, 8)
     .frame(maxWidth: .infinity)
+  }
+  
+  @ViewBuilder func sheetView(_ sheet: SheetContent) -> some View {
+    switch sheet.detail {
+    case .web(let url):
+      ZStack(alignment: .topLeading) {
+        BridgingWebView(url: url, webCaller: nil) { _ in return [:] }
+        #if targetEnvironment(macCatalyst)
+        Button { store.send(.closeSheetTapped) } label: {
+          Image(systemName: "x.circle.fill")
+            .font(.title3)
+            .padding(10)
+        }
+        #endif
+      }
+      
+    case .shareURL(let url):
+      ShareSheet(activityItems: [url], applicationActivities: nil)
+
+    case .quotes(let quotesStore):
+      QuotesView(store: quotesStore)
+
+    case .gameLog(let gameLogStore):
+      GameLogView(store: gameLogStore)
+
+    case .gameCenterAchievements:
+      GameCenterContainerView(gameCenterVC: GKGameCenterViewController(state: .achievements)) {
+        store.send(.closeSheetTapped)
+      }
+    }
   }
 }
 

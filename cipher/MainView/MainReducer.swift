@@ -40,6 +40,7 @@ struct MainReducer: Reducer {
   @MainActor struct State: Equatable, Sendable {
     var alert: AlertContent? = nil
     var sheet: SheetContent? = nil
+    var bigSheet: SheetContent? = nil
     var alertInputText = ""
     var gameCenter: StoreOf<GameCenter>?
   }
@@ -70,11 +71,15 @@ struct MainReducer: Reducer {
         return .none
         
       case .presentRequested(let presentData):
+        state.sheet = nil
+        state.bigSheet = nil
         state.alert = AlertContent(id: presentData.message, message: presentData.message, type: .message)
         return .none
 
       case .openLinkRequested(let openLinkData):
-        state.sheet = SheetContent(id: "open" + openLinkData.url.absoluteString, detail: .web(openLinkData.url))
+        state.sheet = nil
+        state.alert = nil
+        state.bigSheet = SheetContent(id: "open" + openLinkData.url.absoluteString, detail: .web(openLinkData.url))
         return .none
 
       case .shareLinkTapped(let url):
@@ -109,12 +114,14 @@ struct MainReducer: Reducer {
         
       case .closeSheetTapped:
         state.sheet = nil
+        state.bigSheet = nil
         return .none
 
       case .quotes(let quotesAction):
         switch quotesAction {
         case .closeTapped:
           state.sheet = nil
+          state.bigSheet = nil
           return .none
           
         default:
@@ -125,6 +132,7 @@ struct MainReducer: Reducer {
         switch gameLogAction {
         case .tapped(let game):
           state.sheet = nil
+          state.bigSheet = nil
           if let time = game.time, Date().timeIntervalSince1970 - time <= 6 * 24 * 3600 {
             state.sheet = SheetContent(id: "game\(game.uuid)", detail: .web(URL(string: "https://cipherresult.val.run/?id=\(game.uuid)")!))
           } else {
@@ -135,6 +143,7 @@ struct MainReducer: Reducer {
           
         case .closeTapped:
           state.sheet = nil
+          state.bigSheet = nil
 
         default:
           break
@@ -144,7 +153,8 @@ struct MainReducer: Reducer {
       case .gameCenter(let gameCenterAction):
         switch gameCenterAction {
         case .achievementsTapped:
-          state.sheet = SheetContent(id: "gameCenterAchievements", detail: .gameCenterAchievements)
+          state.sheet = nil
+          state.bigSheet = SheetContent(id: "gameCenterAchievements", detail: .gameCenterAchievements)
           return .none
           
         default:

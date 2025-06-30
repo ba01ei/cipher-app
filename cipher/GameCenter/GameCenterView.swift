@@ -14,8 +14,13 @@ struct GameCenterView: View {
   var body: some View {
     HStack {
       if store.state.isAuthenticated {
-        Button("Achievements") {
+        Button {
           store.send(.achievementsTapped)
+        } label: {
+          HStack {
+            Image(systemName: "trophy")
+            Text("Achievements")
+          }
         }
       } else if let vc = store.state.authViewController {
         Button("Login to Game Center") {

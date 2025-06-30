@@ -11,8 +11,8 @@ import GameKit
 enum Achievement: String {
   case firstSolve = "fyi.lei.cipher.firstsolve"
   case independentSolve = "fyi.lei.cipher.independentsolve"
-  case ten = "fyi.lei.cipher.ten"
-  case hundred = "fyi.lei.cipher.hundred"
+  case ten = "fyi.lei.cipher.10"
+  case hundred = "fyi.lei.cipher.100"
   case week = "fyi.lei.cipher.week"
   case month = "fyi.lei.cipher.month"
   case year = "fyi.lei.cipher.year"
@@ -39,11 +39,12 @@ struct AchievementsHelper {
       let dates = wins.compactMap(\.time).map {
         Date(timeIntervalSince1970: $0)
       }
-      if hasNDayStreak(dates: dates, streakLength: 7) {
+      let streak = DateHelper.longestDayStreak(from: dates)
+      if streak >= 7 {
         result.append(.week)
-        if hasNDayStreak(dates: dates, streakLength: 30) {
+        if streak >= 30 {
           result.append(.month)
-          if hasNDayStreak(dates: dates, streakLength: 365) {
+          if streak >= 365 {
             result.append(.year)
           }
         }

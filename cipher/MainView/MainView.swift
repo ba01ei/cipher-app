@@ -19,16 +19,16 @@ struct ContentView: View {
   let webCaller: WebCaller
 
   var body: some View {
-    GeometryReader { geometry in
-      VStack(spacing: 0) {
-        webView
-        Color.black.frame(height: 1 / displayScale).frame(maxWidth: .infinity)
-        bottomBar
-          /// for device without bottom safe area inset, add some padding so the bottom bars are not touching the bottom of the screen
-          .padding(.bottom, geometry.safeAreaInsets.bottom > 0 ? 0 : 8)
+    NavigationStack {
+      GeometryReader { geometry in
+        VStack(spacing: 0) {
+          webView
+          Color.black.frame(height: 1 / displayScale).frame(maxWidth: .infinity)
+        }
+        .toolbar { bottomBar }
       }
+      
     }
-    .ignoresSafeArea(.keyboard, edges: .bottom)
     .sheet(item: $store.state.sheet, content: { sheet in
       sheetView(sheet)
     })
@@ -76,38 +76,40 @@ struct ContentView: View {
     }
   }
 
-  var bottomBar: some View {
-    HStack(alignment: .lastTextBaseline) {
-      bottomBarButton("New game", "arrow.clockwise") {
-        Task {
-          do {
-            let aliveResult = try await webCaller.sendMessageToWeb?(["action": "alive"]) as? [String: Any]
-            if (aliveResult?["result"] as? Bool) == true {
-              _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
-              return
+  @ToolbarContentBuilder var bottomBar: some ToolbarContent {
+    ToolbarItem(placement: .bottomBar) {
+      HStack(spacing: 0) {
+        bottomBarButton("New game", "arrow.clockwise") {
+          Task {
+            do {
+              let aliveResult = try await webCaller.sendMessageToWeb?(["action": "alive"]) as? [String: Any]
+              if (aliveResult?["result"] as? Bool) == true {
+                _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
+                return
+              }
+            } catch {
+              print("error: \(error)")
             }
-          } catch {
-            print("error: \(error)")
+            webCaller.reloadUrl?(startingUrl)
           }
-          webCaller.reloadUrl?(startingUrl)
+        }
+        bottomBarButton("Join", "person.badge.plus") {
+          store.send(.joinTapped)
+        }
+        bottomBarButton("Share", "square.and.arrow.up") {
+          if let url = webCaller.currentUrl?() {
+            store.send(.shareLinkTapped(url))
+          }
+        }
+        bottomBarButton("Quotes", "book") {
+          store.send(.quotesTapped)
+        }
+        bottomBarButton("Games", "chart.bar") {
+          store.send(.gameLogTapped)
         }
       }
-      bottomBarButton("Join", "person.badge.plus") {
-        store.send(.joinTapped)
-      }
-      bottomBarButton("Share", "square.and.arrow.up") {
-        if let url = webCaller.currentUrl?() {
-          store.send(.shareLinkTapped(url))
-        }
-      }
-      bottomBarButton("Quotes", "book") {
-        store.send(.quotesTapped)
-      }
-      bottomBarButton("Games", "chart.bar") {
-        store.send(.gameLogTapped)
-      }
+      .padding(.top, 10)
     }
-    .frame(maxWidth: .infinity)
   }
   
   func bottomBarButton(_ title: String, _ sfSymbol: String, action: @escaping @MainActor () -> Void) -> some View {
@@ -116,10 +118,9 @@ struct ContentView: View {
         Image(systemName: sfSymbol).font(.system(size: 20))
         Text(title).font(.caption)
       }
+      .foregroundStyle(.primary)
+      .frame(width: 60)
     }
-    .foregroundStyle(.primary)
-    .padding(.top, 8)
-    .frame(maxWidth: .infinity)
   }
   
   @ViewBuilder func sheetView(_ sheet: SheetContent) -> some View {

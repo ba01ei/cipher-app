@@ -23,7 +23,7 @@ struct ContentView: View {
       GeometryReader { geometry in
         VStack(spacing: 0) {
           webView
-          Color.black.frame(height: 1 / displayScale).frame(maxWidth: .infinity)
+          Color.accentColor.frame(height: 1 / displayScale).frame(maxWidth: .infinity)
         }
         .toolbar { bottomBar }
       }
@@ -108,14 +108,14 @@ struct ContentView: View {
           store.send(.gameLogTapped)
         }
       }
-      .padding(.top, 10)
+      .padding(.top, 2)
     }
   }
   
   func bottomBarButton(_ title: String, _ sfSymbol: String, action: @escaping @MainActor () -> Void) -> some View {
     Button(action: action) {
       VStack(spacing: 4) {
-        Image(systemName: sfSymbol).font(.system(size: 20))
+        Image(systemName: sfSymbol).frame(height: 18)
         Text(title).font(.caption)
       }
       .foregroundStyle(.primary)

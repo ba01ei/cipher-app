@@ -33,6 +33,7 @@ struct FinishData: Codable, Equatable, Identifiable, Sendable {
   let timeTaken: Int
   let hintCount: Int
   let keywordRevealed: Bool
+  let hardMode: Bool?
   var time: TimeInterval?
   
   var id: String {

@@ -39,9 +39,9 @@ struct GameLogView: View {
         }
         ForEach(games) { game in
           HStack {
-            Image(systemName: game.success ? "trophy.circle.fill" : "xmark.circle.fill")
+            Image(systemName: game.hardMode == true ? "medal.fill" : (game.success ? "trophy.circle.fill" : "xmark.circle.fill"))
               .font(.system(size: 20))
-              .foregroundStyle(game.success ? Color.green : Color.red)
+              .foregroundStyle(game.hardMode == true ? Color.yellow : (game.success ? Color.green : Color.red))
             VStack(alignment: .leading) {
               Text(game.id)
               if let time = game.time {
@@ -61,6 +61,11 @@ struct GameLogView: View {
               if game.keywordRevealed {
                 Text("Used keyword reveal")
                   .foregroundStyle(Color.secondary)
+                  .font(.caption)
+              }
+              if game.hardMode == true {
+                Text("Hard Mode")
+                  .foregroundStyle(Color.orange)
                   .font(.caption)
               }
             }

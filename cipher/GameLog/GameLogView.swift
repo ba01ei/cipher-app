@@ -9,10 +9,10 @@ import MiniRedux
 import SwiftUI
 
 struct GameLogView: View {
-  @ObservedObject var store: StoreOf<GameLogReducer>
+  let store: GameLogStore
 
   var body: some View {
-    if store.state.games?.isEmpty == true {
+    if store.games?.isEmpty == true {
       VStack {
         Image(systemName: "circle.slash").font(.system(size: 26))
           .padding()
@@ -21,7 +21,7 @@ struct GameLogView: View {
           .padding()
         Spacer()
       }
-    } else if let games = store.state.games {
+    } else if let games = store.games {
       List {
         HStack {
           Text("Game Log").font(.headline)
@@ -34,7 +34,7 @@ struct GameLogView: View {
           }
 #endif
         }
-        if let gameCenterStore = store.state.gameCenter, gameCenterStore.state.canShowGameCenter {
+        if let gameCenterStore = store.gameCenter, gameCenterStore.canShowGameCenter {
           GameCenterView(store: gameCenterStore)
         }
         ForEach(games) { game in

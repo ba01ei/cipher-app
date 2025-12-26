@@ -17,12 +17,12 @@ struct AlertContent: Equatable, Sendable, Identifiable {
   let type: AlertType
 }
 
-struct SheetContent: Equatable, Sendable, Identifiable {
-  enum Detail: Equatable, Sendable {
+struct SheetContent: Sendable, Identifiable {
+  enum Detail: Sendable {
     case web(URL)
     case shareURL(URL)
-    case quotes(StoreOf<QuotesReducer>)
-    case gameLog(StoreOf<GameLogReducer>)
+    case quotes(QuotesStore)
+    case gameLog(GameLogStore)
     case gameCenterAchievements
     case gameCenterAuth
   }
@@ -42,7 +42,7 @@ let gameResultsKey = "game_results"
   var sheet: SheetContent? = nil
   var bigSheet: SheetContent? = nil
   var alertInputText = ""
-  var gameCenter: StoreOf<GameCenter>?
+  var gameCenter: GameCenterStore?
   
   enum Action: Sendable {
     case initialized
@@ -55,17 +55,22 @@ let gameResultsKey = "game_results"
     case errorOccurred(ErrorType)
     case closeSheetTapped
     
-    case quotes(QuotesReducer.Action)
-    case gameLog(GameLogReducer.Action)
-    case gameCenter(GameCenter.Action)
+    case quotes(QuotesStore.Action)
+    case gameLog(GameLogStore.Action)
+    case gameCenter(GameCenterStore.Action)
+  }
+  
+  override init(delegatedActionHandler: ((Action) -> Void)? = nil) {
+    super.init(delegatedActionHandler: delegatedActionHandler)
+    send(.initialized)
   }
   
   override func reduce(_ action: Action) -> Effect<Action> {
     switch action {
     case .initialized:
-      gameCenter = GameCenter.store().delegate({ [weak self] childAction in
+      gameCenter = GameCenterStore() { [weak self] childAction in
         self?.send(.gameCenter(childAction))
-      })
+      }
       return .none
       
     case .presentRequested(let presentData):
@@ -85,9 +90,9 @@ let gameResultsKey = "game_results"
       return .none
 
     case .quotesTapped:
-      sheet = SheetContent(id: "quotes", detail: .quotes(QuotesReducer.store().delegate({ [weak self] childAction in
+      sheet = SheetContent(id: "quotes", detail: .quotes(QuotesStore() { [weak self] childAction in
         self?.send(.quotes(childAction))
-      })))
+      }))
       return .none
 
     case .joinTapped:
@@ -105,9 +110,9 @@ let gameResultsKey = "game_results"
       }
       
     case .gameLogTapped:
-      sheet = SheetContent(id: "gameLog", detail: .gameLog(GameLogReducer.store(gameCenter: gameCenter).delegate({ [weak self] childAction in
+      sheet = SheetContent(id: "gameLog", detail: .gameLog(GameLogStore(gameCenterStore: gameCenter) { [weak self] childAction in
         self?.send(.gameLog(childAction))
-      })))
+      }))
       return .none
       
     case .closeSheetTapped:

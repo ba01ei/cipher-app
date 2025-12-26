@@ -9,12 +9,12 @@ import MiniRedux
 import SwiftUI
 
 struct QuotesView: View {
-  @ObservedObject var store: StoreOf<QuotesReducer>
+  let store: QuotesStore
   @Environment(\.openURL) var openURL
   @State var showSheet = false
 
   var body: some View {
-    if store.state.quotes?.isEmpty == true {
+    if store.quotes?.isEmpty == true {
       VStack {
         Image(systemName: "text.page.slash").font(.system(size: 26))
           .padding()
@@ -23,13 +23,13 @@ struct QuotesView: View {
           .padding()
         Spacer()
       }
-    } else if !store.state.notDeleted.isEmpty {
+    } else if !store.notDeleted.isEmpty {
       List {
         Button {
           showSheet = true
         } label: {
           HStack {
-            Text("Decoded Quotes").font(.headline) + Text(" — \(store.state.notDeleted.count)")
+            Text("Decoded Quotes").font(.headline) + Text(" — \(store.notDeleted.count)")
             Spacer()
 #if targetEnvironment(macCatalyst)
             Button { store.send(.closeTapped) } label: {
@@ -40,7 +40,7 @@ struct QuotesView: View {
 #endif
           }
         }
-        ForEach(store.state.notDeleted, id: \.text) { quote in
+        ForEach(store.notDeleted, id: \.text) { quote in
           VStack {
             Text(quote.text).foregroundColor(Color.primary) + Text(" - " + quote.by).foregroundColor(.secondary)
           }
@@ -65,5 +65,5 @@ struct QuotesView: View {
 }
 
 #Preview {
-  QuotesView(store: QuotesReducer.store())
+  QuotesView(store: QuotesStore())
 }

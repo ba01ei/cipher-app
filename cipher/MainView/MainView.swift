@@ -181,7 +181,7 @@ struct ContentView: View {
       }
       
     case .gameCenterAuth:
-      if let vc = store.gameCenter?.state.authViewController {
+      if let vc = store.gameCenter?.authViewController {
         GameCenterContainerView(gameCenterVC: vc) {
           store.send(.closeSheetTapped)
         }

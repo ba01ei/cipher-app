@@ -9,11 +9,11 @@ import SwiftUI
 import MiniRedux
 
 struct GameCenterView: View {
-  @ObservedObject var store: StoreOf<GameCenter>
+  let store: GameCenterStore
   
   var body: some View {
     HStack {
-      if store.state.isAuthenticated {
+      if store.isAuthenticated {
         Button {
           store.send(.achievementsTapped)
         } label: {
@@ -22,7 +22,7 @@ struct GameCenterView: View {
             Text("Achievements")
           }
         }
-      } else if let vc = store.state.authViewController {
+      } else if let vc = store.authViewController {
         Button("Login to Game Center") {
           store.send(.authTapped(vc))
         }

@@ -20,12 +20,12 @@ struct ContentView: View {
         .ignoresSafeArea()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .toolbar { bottomBar }
-        .sheet(item: $store.sheet, content: { sheet in
+        .sheet(item: $store.sheet) { sheet in
           sheetView(sheet)
-        })
-        .fullScreenCover(item: $store.bigSheet, content: { sheet in
+        }
+        .fullScreenCover(item: $store.bigSheet) { sheet in
           sheetView(sheet)
-        })
+        }
         .alert(store.alert?.message ?? "", isPresented: Binding(get: {
           store.alert != nil
         }, set: { shown in

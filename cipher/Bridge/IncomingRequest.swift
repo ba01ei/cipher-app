@@ -37,6 +37,10 @@ struct FinishData: Codable, Equatable, Identifiable, Sendable {
   var time: TimeInterval?
   
   var id: String {
+    "\(uuid)-\(time, default: "")"
+  }
+  
+  var display: String {
     uuid.replacingOccurrences(of: "cipher-", with: "")
   }
 }

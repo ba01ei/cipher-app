@@ -10,13 +10,9 @@ import MiniRedux
 import SwiftUI
 import GameKit
 
-let startingUrl = URL(string: "https://cipher.lei.fyi")
-
 struct ContentView: View {
-  @State var store = MainStore()
+  @Bindable var store: MainStore
   @Environment(\.displayScale) var displayScale
-
-  let webCaller: WebCaller
 
   var body: some View {
     NavigationStack {
@@ -36,25 +32,17 @@ struct ContentView: View {
           if !shown {
             store.alert = nil
           }
-        })) { [alertId = store.alert?.id] in
+        })) {
           if store.alert?.type == .input {
             TextField("", text: $store.alertInputText)
               .keyboardType(.numberPad)
           }
           Button("OK") {
-            if alertId == "join" {
-              let id = store.alertInputText.trimmingCharacters(in: .whitespacesAndNewlines)
-              if id.allSatisfy({ $0.isNumber }) {
-                webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.alertInputText)")!)
-              } else {
-                store.send(.errorOccurred(.invalidGameId))
-              }
-              store.alertInputText = ""
-            }
+            store.send(.alertOKButtonTapped)
           }
           if store.alert?.type == .input {
             Button("Cancel", role: .cancel) {
-              store.alertInputText = ""
+              store.send(.alertCancelButtonTapped)
             }
           }
         }
@@ -62,7 +50,7 @@ struct ContentView: View {
   }
 
   var webView: some View {
-    BridgingWebView(url: startingUrl, webCaller: webCaller) { request in
+    BridgingWebView(url: startingUrl, webCaller: store.webCaller) { request in
       do {
         return try await store.handleBridgeRequest(request)
       } catch {
@@ -104,18 +92,7 @@ struct ContentView: View {
   
   var newGameButton: some View {
     bottomBarButton("New game", "arrow.clockwise") {
-      Task {
-        do {
-          let aliveResult = try await webCaller.sendMessageToWeb?(["action": "alive"]) as? [String: Any]
-          if (aliveResult?["result"] as? Bool) == true {
-            _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
-            return
-          }
-        } catch {
-          print("error: \(error)")
-        }
-        webCaller.reloadUrl?(startingUrl)
-      }
+      store.send(.newGameTapped)
     }
   }
   
@@ -127,9 +104,7 @@ struct ContentView: View {
   
   var shareButton: some View {
     bottomBarButton("Share", "square.and.arrow.up") {
-      if let url = webCaller.currentUrl?() {
-        store.send(.shareLinkTapped(url))
-      }
+      store.send(.shareLinkTapped)
     }
   }
   
@@ -197,4 +172,3 @@ struct ContentView: View {
     }
   }
 }
-

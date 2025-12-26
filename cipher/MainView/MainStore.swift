@@ -6,6 +6,9 @@
 //
 import MiniRedux
 import Foundation
+import BridgingWebView
+
+let startingUrl = URL(string: "https://cipher.lei.fyi")
 
 struct AlertContent: Equatable, Sendable, Identifiable {
   enum AlertType: Equatable, Codable {
@@ -43,17 +46,22 @@ let gameResultsKey = "game_results"
   var bigSheet: SheetContent? = nil
   var alertInputText = ""
   var gameCenter: GameCenterStore?
+  @ObservationIgnored let webCaller = WebCaller()
   
   enum Action: Sendable {
     case initialized
     case presentRequested(PresentData)
     case openLinkRequested(OpenLinkData)
-    case shareLinkTapped(URL)
+    case shareLinkTapped
+    case newGameTapped
     case quotesTapped
     case joinTapped
     case gameLogTapped
     case errorOccurred(ErrorType)
     case closeSheetTapped
+    case alertOKButtonTapped
+    case alertCancelButtonTapped
+    case deeplinkRequested(URL)
     
     case quotes(QuotesStore.Action)
     case gameLog(GameLogStore.Action)
@@ -78,6 +86,20 @@ let gameResultsKey = "game_results"
       bigSheet = nil
       alert = AlertContent(id: presentData.message, message: presentData.message, type: .message)
       return .none
+      
+    case .newGameTapped:
+      return .run { [webCaller] send in
+        do {
+          let aliveResult = try await webCaller.sendMessageToWeb?(["action": "alive"]) as? [String: Any]
+          if (aliveResult?["result"] as? Bool) == true {
+            _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
+            return
+          }
+        } catch {
+          print("error: \(error)")
+        }
+        await webCaller.reloadUrl?(startingUrl)
+      }
 
     case .openLinkRequested(let openLinkData):
       sheet = nil
@@ -85,8 +107,10 @@ let gameResultsKey = "game_results"
       bigSheet = SheetContent(id: "open" + openLinkData.url.absoluteString, detail: .web(openLinkData.url))
       return .none
 
-    case .shareLinkTapped(let url):
-      sheet = SheetContent(id: "share" + url.absoluteString, detail: .shareURL(url))
+    case .shareLinkTapped:
+      if let url = webCaller.currentUrl?() {
+        sheet = SheetContent(id: "share" + url.absoluteString, detail: .shareURL(url))
+      }
       return .none
 
     case .quotesTapped:
@@ -119,6 +143,28 @@ let gameResultsKey = "game_results"
       sheet = nil
       bigSheet = nil
       return .none
+      
+    case .alertOKButtonTapped:
+      if alert?.id == "join" {
+        let id = alertInputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if id.allSatisfy({ $0.isNumber }) {
+          webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(alertInputText)")!)
+        } else {
+          send(.errorOccurred(.invalidGameId))
+        }
+        alertInputText = ""
+      }
+      return .none
+      
+    case .alertCancelButtonTapped:
+      alertInputText = ""
+      return .none
+      
+    case .deeplinkRequested(let url):
+      return .run { [webCaller] _ in
+        try? await Task.sleep(for: .milliseconds(500))
+        await webCaller.reloadUrl?(url)
+      }
 
     case .quotes(let quotesAction):
       switch quotesAction {

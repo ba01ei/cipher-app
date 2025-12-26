@@ -10,16 +10,12 @@ import BridgingWebView
 
 @main
 struct cipherApp: App {
-  let webCaller = WebCaller()
+  let store = MainStore()
   var body: some Scene {
     WindowGroup {
-      ContentView(webCaller: webCaller)
+      ContentView(store: store)
         .onOpenURL { url in
-          // Handle universal links here
-          Task {
-            try? await Task.sleep(for: .milliseconds(500))
-            webCaller.reloadUrl?(url)
-          }
+          store.send(.deeplinkRequested(url))
         }
     }
   }

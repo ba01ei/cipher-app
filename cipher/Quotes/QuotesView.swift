@@ -11,7 +11,6 @@ import SwiftUI
 struct QuotesView: View {
   let store: QuotesStore
   @Environment(\.openURL) var openURL
-  @State var showSheet = false
 
   var body: some View {
     if store.quotes?.isEmpty == true {
@@ -25,20 +24,16 @@ struct QuotesView: View {
       }
     } else if !store.notDeleted.isEmpty {
       List {
-        Button {
-          showSheet = true
-        } label: {
-          HStack {
-            Text("Decoded Quotes").font(.headline) + Text(" — \(store.notDeleted.count)")
-            Spacer()
+        HStack {
+          Text("Decoded Quotes").font(.headline) + Text(" — \(store.notDeleted.count)")
+          Spacer()
 #if targetEnvironment(macCatalyst)
-            Button { store.send(.closeTapped) } label: {
-              Image(systemName: "xmark.circle")
-                .font(.title)
-                .tint(.primary)
-            }
-#endif
+          Button { store.send(.closeTapped) } label: {
+            Image(systemName: "xmark.circle")
+              .font(.title)
+              .tint(.primary)
           }
+#endif
         }
         ForEach(store.notDeleted, id: \.text) { quote in
           VStack {
@@ -56,9 +51,6 @@ struct QuotesView: View {
               .tint(.red)
             }
         }
-      }
-      .sheet(isPresented: $showSheet) {
-        Text("Solve more ciphers to unlock more quotes")
       }
     }
   }

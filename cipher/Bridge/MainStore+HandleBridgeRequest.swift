@@ -9,7 +9,7 @@ import Foundation
 import MiniRedux
 import GameKit
 
-extension StoreOf<MainReducer> {
+extension MainStore {
   func handleBridgeRequest(_ request: any Sendable) async throws -> [String: any Sendable] {
     guard let json = request as? [String: Any] else {
       return [:]

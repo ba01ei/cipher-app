@@ -37,14 +37,12 @@ enum ErrorType: String, Sendable {
 let knownQuotesKey = "known_quotes"
 let gameResultsKey = "game_results"
 
-struct MainReducer: Reducer {
-  @MainActor struct State: Equatable, Sendable {
-    var alert: AlertContent? = nil
-    var sheet: SheetContent? = nil
-    var bigSheet: SheetContent? = nil
-    var alertInputText = ""
-    var gameCenter: StoreOf<GameCenter>?
-  }
+@Observable class MainStore: BaseStore<MainStore.Action> {
+  var alert: AlertContent? = nil
+  var sheet: SheetContent? = nil
+  var bigSheet: SheetContent? = nil
+  var alertInputText = ""
+  var gameCenter: StoreOf<GameCenter>?
   
   enum Action: Sendable {
     case initialized
@@ -62,112 +60,110 @@ struct MainReducer: Reducer {
     case gameCenter(GameCenter.Action)
   }
   
-  @MainActor static func store() -> StoreOf<Self> {
-    Store(initialState: State(), initialAction: .initialized) { state, action, send in
-      switch action {
-      case .initialized:
-        state.gameCenter = GameCenter.store().delegate({ childAction in
-          send(.gameCenter(childAction))
-        })
-        return .none
-        
-      case .presentRequested(let presentData):
-        state.sheet = nil
-        state.bigSheet = nil
-        state.alert = AlertContent(id: presentData.message, message: presentData.message, type: .message)
-        return .none
+  override func reduce(_ action: Action) -> Effect<Action> {
+    switch action {
+    case .initialized:
+      gameCenter = GameCenter.store().delegate({ [weak self] childAction in
+        self?.send(.gameCenter(childAction))
+      })
+      return .none
+      
+    case .presentRequested(let presentData):
+      sheet = nil
+      bigSheet = nil
+      alert = AlertContent(id: presentData.message, message: presentData.message, type: .message)
+      return .none
 
-      case .openLinkRequested(let openLinkData):
-        state.sheet = nil
-        state.alert = nil
-        state.bigSheet = SheetContent(id: "open" + openLinkData.url.absoluteString, detail: .web(openLinkData.url))
-        return .none
+    case .openLinkRequested(let openLinkData):
+      sheet = nil
+      alert = nil
+      bigSheet = SheetContent(id: "open" + openLinkData.url.absoluteString, detail: .web(openLinkData.url))
+      return .none
 
-      case .shareLinkTapped(let url):
-        state.sheet = SheetContent(id: "share" + url.absoluteString, detail: .shareURL(url))
-        return .none
+    case .shareLinkTapped(let url):
+      sheet = SheetContent(id: "share" + url.absoluteString, detail: .shareURL(url))
+      return .none
 
-      case .quotesTapped:
-        state.sheet = SheetContent(id: "quotes", detail: .quotes(QuotesReducer.store().delegate({ childAction in
-          send(.quotes(childAction))
-        })))
-        return .none
+    case .quotesTapped:
+      sheet = SheetContent(id: "quotes", detail: .quotes(QuotesReducer.store().delegate({ [weak self] childAction in
+        self?.send(.quotes(childAction))
+      })))
+      return .none
 
-      case .joinTapped:
-        state.alert = AlertContent(id: "join", message: "Enter Game ID", type: .input)
-        return .none
+    case .joinTapped:
+      alert = AlertContent(id: "join", message: "Enter Game ID", type: .input)
+      return .none
 
-      case .errorOccurred(let error):
-        switch error {
-        case .invalidGameId:
-          state.alert = nil
-          return .run { send in
-            try? await Task.sleep(for: .milliseconds(300))
-            await send(.presentRequested(PresentData(message: "Game ID must be a number")))
-          }
+    case .errorOccurred(let error):
+      switch error {
+      case .invalidGameId:
+        alert = nil
+        return .run { send in
+          try? await Task.sleep(for: .milliseconds(300))
+          await send(.presentRequested(PresentData(message: "Game ID must be a number")))
         }
-        
-      case .gameLogTapped:
-        state.sheet = SheetContent(id: "gameLog", detail: .gameLog(GameLogReducer.store(gameCenter: state.gameCenter).delegate({ childAction in
-          send(.gameLog(childAction))
-        })))
-        return .none
-        
-      case .closeSheetTapped:
-        state.sheet = nil
-        state.bigSheet = nil
-        return .none
-
-      case .quotes(let quotesAction):
-        switch quotesAction {
-        case .closeTapped:
-          state.sheet = nil
-          state.bigSheet = nil
-          return .none
-          
-        default:
-          return .none
-        }
-
-      case .gameLog(let gameLogAction):
-        switch gameLogAction {
-        case .tapped(let game):
-          state.sheet = nil
-          state.bigSheet = nil
-          if let time = game.time, Date().timeIntervalSince1970 - time <= 6 * 24 * 3600 {
-            state.sheet = SheetContent(id: "game\(game.uuid)", detail: .web(URL(string: "https://cipherresult.val.run/?id=\(game.uuid)")!))
-          } else {
-            return .run { send in
-              await send(.presentRequested(PresentData(message: "The game is no long available.")))
-            }
-          }
-          
-        case .closeTapped:
-          state.sheet = nil
-          state.bigSheet = nil
-
-        default:
-          break
-        }
-        return .none
-        
-      case .gameCenter(let gameCenterAction):
-        switch gameCenterAction {
-        case .achievementsTapped:
-          state.sheet = nil
-          state.bigSheet = SheetContent(id: "gameCenterAchievements", detail: .gameCenterAchievements)
-          return .none
-          
-        case .authTapped:
-          state.sheet = nil
-          state.bigSheet = SheetContent(id: "gameCenterAuth", detail: .gameCenterAuth)
-          return .none
-          
-        default:
-          return .none
-        }
-
       }
+      
+    case .gameLogTapped:
+      sheet = SheetContent(id: "gameLog", detail: .gameLog(GameLogReducer.store(gameCenter: gameCenter).delegate({ [weak self] childAction in
+        self?.send(.gameLog(childAction))
+      })))
+      return .none
+      
+    case .closeSheetTapped:
+      sheet = nil
+      bigSheet = nil
+      return .none
+
+    case .quotes(let quotesAction):
+      switch quotesAction {
+      case .closeTapped:
+        sheet = nil
+        bigSheet = nil
+        return .none
+        
+      default:
+        return .none
+      }
+
+    case .gameLog(let gameLogAction):
+      switch gameLogAction {
+      case .tapped(let game):
+        sheet = nil
+        bigSheet = nil
+        if let time = game.time, Date().timeIntervalSince1970 - time <= 6 * 24 * 3600 {
+          sheet = SheetContent(id: "game\(game.uuid)", detail: .web(URL(string: "https://cipherresult.val.run/?id=\(game.uuid)")!))
+        } else {
+          return .run { send in
+            await send(.presentRequested(PresentData(message: "The game is no long available.")))
+          }
+        }
+        
+      case .closeTapped:
+        sheet = nil
+        bigSheet = nil
+
+      default:
+        break
+      }
+      return .none
+      
+    case .gameCenter(let gameCenterAction):
+      switch gameCenterAction {
+      case .achievementsTapped:
+        sheet = nil
+        bigSheet = SheetContent(id: "gameCenterAchievements", detail: .gameCenterAchievements)
+        return .none
+        
+      case .authTapped:
+        sheet = nil
+        bigSheet = SheetContent(id: "gameCenterAuth", detail: .gameCenterAuth)
+        return .none
+        
+      default:
+        return .none
+      }
+
     }
   }
 }

@@ -13,7 +13,7 @@ import GameKit
 let startingUrl = URL(string: "https://cipher.lei.fyi")
 
 struct ContentView: View {
-  @ObservedObject var store = MainReducer.store()
+  @State var store = MainStore()
   @Environment(\.displayScale) var displayScale
 
   let webCaller: WebCaller
@@ -24,37 +24,37 @@ struct ContentView: View {
         .ignoresSafeArea()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .toolbar { bottomBar }
-        .sheet(item: $store.state.sheet, content: { sheet in
+        .sheet(item: $store.sheet, content: { sheet in
           sheetView(sheet)
         })
-        .fullScreenCover(item: $store.state.bigSheet, content: { sheet in
+        .fullScreenCover(item: $store.bigSheet, content: { sheet in
           sheetView(sheet)
         })
-        .alert(store.state.alert?.message ?? "", isPresented: Binding(get: {
-          store.state.alert != nil
+        .alert(store.alert?.message ?? "", isPresented: Binding(get: {
+          store.alert != nil
         }, set: { shown in
           if !shown {
-            store.state.alert = nil
+            store.alert = nil
           }
-        })) { [alertId = store.state.alert?.id] in
-          if store.state.alert?.type == .input {
-            TextField("", text: $store.state.alertInputText)
+        })) { [alertId = store.alert?.id] in
+          if store.alert?.type == .input {
+            TextField("", text: $store.alertInputText)
               .keyboardType(.numberPad)
           }
           Button("OK") {
             if alertId == "join" {
-              let id = store.state.alertInputText.trimmingCharacters(in: .whitespacesAndNewlines)
+              let id = store.alertInputText.trimmingCharacters(in: .whitespacesAndNewlines)
               if id.allSatisfy({ $0.isNumber }) {
-                webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.state.alertInputText)")!)
+                webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.alertInputText)")!)
               } else {
                 store.send(.errorOccurred(.invalidGameId))
               }
-              store.state.alertInputText = ""
+              store.alertInputText = ""
             }
           }
-          if store.state.alert?.type == .input {
+          if store.alert?.type == .input {
             Button("Cancel", role: .cancel) {
-              store.state.alertInputText = ""
+              store.alertInputText = ""
             }
           }
         }
@@ -181,7 +181,7 @@ struct ContentView: View {
       }
       
     case .gameCenterAuth:
-      if let vc = store.state.gameCenter?.state.authViewController {
+      if let vc = store.gameCenter?.state.authViewController {
         GameCenterContainerView(gameCenterVC: vc) {
           store.send(.closeSheetTapped)
         }

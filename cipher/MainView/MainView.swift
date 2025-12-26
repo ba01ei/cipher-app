@@ -20,48 +20,44 @@ struct ContentView: View {
 
   var body: some View {
     NavigationStack {
-      GeometryReader { geometry in
-        VStack(spacing: 0) {
-          webView
-          Color.accentColor.frame(height: 1 / displayScale).frame(maxWidth: .infinity)
-        }
+      webView
+        .ignoresSafeArea()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .toolbar { bottomBar }
-      }
-      
-    }
-    .sheet(item: $store.state.sheet, content: { sheet in
-      sheetView(sheet)
-    })
-    .fullScreenCover(item: $store.state.bigSheet, content: { sheet in
-      sheetView(sheet)
-    })
-    .alert(store.state.alert?.message ?? "", isPresented: Binding(get: {
-      store.state.alert != nil
-    }, set: { shown in
-      if !shown {
-        store.state.alert = nil
-      }
-    })) { [alertId = store.state.alert?.id] in
-      if store.state.alert?.type == .input {
-        TextField("", text: $store.state.alertInputText)
-          .keyboardType(.numberPad)
-      }
-      Button("OK") {
-        if alertId == "join" {
-          let id = store.state.alertInputText.trimmingCharacters(in: .whitespacesAndNewlines)
-          if id.allSatisfy({ $0.isNumber }) {
-            webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.state.alertInputText)")!)
-          } else {
-            store.send(.errorOccurred(.invalidGameId))
+        .sheet(item: $store.state.sheet, content: { sheet in
+          sheetView(sheet)
+        })
+        .fullScreenCover(item: $store.state.bigSheet, content: { sheet in
+          sheetView(sheet)
+        })
+        .alert(store.state.alert?.message ?? "", isPresented: Binding(get: {
+          store.state.alert != nil
+        }, set: { shown in
+          if !shown {
+            store.state.alert = nil
           }
-          store.state.alertInputText = ""
+        })) { [alertId = store.state.alert?.id] in
+          if store.state.alert?.type == .input {
+            TextField("", text: $store.state.alertInputText)
+              .keyboardType(.numberPad)
+          }
+          Button("OK") {
+            if alertId == "join" {
+              let id = store.state.alertInputText.trimmingCharacters(in: .whitespacesAndNewlines)
+              if id.allSatisfy({ $0.isNumber }) {
+                webCaller.reloadUrl?(URL(string: "https://cipher.lei.fyi/\(store.state.alertInputText)")!)
+              } else {
+                store.send(.errorOccurred(.invalidGameId))
+              }
+              store.state.alertInputText = ""
+            }
+          }
+          if store.state.alert?.type == .input {
+            Button("Cancel", role: .cancel) {
+              store.state.alertInputText = ""
+            }
+          }
         }
-      }
-      if store.state.alert?.type == .input {
-        Button("Cancel", role: .cancel) {
-          store.state.alertInputText = ""
-        }
-      }
     }
   }
 
@@ -77,50 +73,87 @@ struct ContentView: View {
   }
 
   @ToolbarContentBuilder var bottomBar: some ToolbarContent {
-    ToolbarItem(placement: .bottomBar) {
-      HStack(spacing: 0) {
-        bottomBarButton("New game", "arrow.clockwise") {
-          Task {
-            do {
-              let aliveResult = try await webCaller.sendMessageToWeb?(["action": "alive"]) as? [String: Any]
-              if (aliveResult?["result"] as? Bool) == true {
-                _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
-                return
-              }
-            } catch {
-              print("error: \(error)")
-            }
-            webCaller.reloadUrl?(startingUrl)
-          }
-        }
-        bottomBarButton("Join", "person.badge.plus") {
-          store.send(.joinTapped)
-        }
-        bottomBarButton("Share", "square.and.arrow.up") {
-          if let url = webCaller.currentUrl?() {
-            store.send(.shareLinkTapped(url))
-          }
-        }
-        bottomBarButton("Quotes", "book") {
-          store.send(.quotesTapped)
-        }
-        bottomBarButton("Games", "chart.bar") {
-          store.send(.gameLogTapped)
+    if iOS26 {
+      ToolbarItem(placement: .bottomBar) {
+        newGameButton
+      }
+      ToolbarItem(placement: .bottomBar) {
+        joinButton
+      }
+      ToolbarItem(placement: .bottomBar) {
+        shareButton
+      }
+      ToolbarItem(placement: .bottomBar) {
+        quotesButton
+      }
+      ToolbarItem(placement: .bottomBar) {
+        gamesButton
+      }
+    } else {
+      ToolbarItem(placement: .bottomBar){
+        HStack {
+          newGameButton
+          joinButton
+          shareButton
+          quotesButton
+          gamesButton
         }
       }
-      .padding(.top, 2)
     }
   }
   
+  var newGameButton: some View {
+    bottomBarButton("New game", "arrow.clockwise") {
+      Task {
+        do {
+          let aliveResult = try await webCaller.sendMessageToWeb?(["action": "alive"]) as? [String: Any]
+          if (aliveResult?["result"] as? Bool) == true {
+            _ = try await webCaller.sendMessageToWeb?(["action": "startNewGame"])
+            return
+          }
+        } catch {
+          print("error: \(error)")
+        }
+        webCaller.reloadUrl?(startingUrl)
+      }
+    }
+  }
+  
+  var joinButton: some View {
+    bottomBarButton("Join", "person.badge.plus") {
+      store.send(.joinTapped)
+    }
+  }
+  
+  var shareButton: some View {
+    bottomBarButton("Share", "square.and.arrow.up") {
+      if let url = webCaller.currentUrl?() {
+        store.send(.shareLinkTapped(url))
+      }
+    }
+  }
+  
+  var quotesButton: some View {
+    bottomBarButton("Quotes", "book") {
+      store.send(.quotesTapped)
+    }
+  }
+  
+  var gamesButton: some View {
+    bottomBarButton("Games", "chart.bar") {
+      store.send(.gameLogTapped)
+    }
+  }
+
   func bottomBarButton(_ title: String, _ sfSymbol: String, action: @escaping @MainActor () -> Void) -> some View {
     Button(action: action) {
       VStack(spacing: 4) {
-        Image(systemName: sfSymbol).frame(height: 18)
+        Image(systemName: sfSymbol).font(.system(size: 16)).frame(height: 18)
         Text(title).font(.caption)
       }
       .foregroundStyle(.primary)
-      .frame(width: 60)
     }
+    .padding(.vertical, 5)
   }
   
   @ViewBuilder func sheetView(_ sheet: SheetContent) -> some View {

@@ -42,7 +42,7 @@ struct QuotesView: View {
         }
         ForEach(store.state.notDeleted, id: \.text) { quote in
           VStack {
-            Text(quote.text).foregroundStyle(Color.primary) + Text(" - " + quote.by).foregroundColor(.secondary)
+            Text(quote.text).foregroundColor(Color.primary) + Text(" - " + quote.by).foregroundColor(.secondary)
           }
             .onTapGesture {
               if let url = store.urlForQuote(quote) {

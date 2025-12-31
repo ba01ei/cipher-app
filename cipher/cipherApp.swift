@@ -13,7 +13,7 @@ struct cipherApp: App {
   let store = MainStore()
   var body: some Scene {
     WindowGroup {
-      ContentView(store: store)
+      MainView(store: store)
         .onOpenURL { url in
           store.send(.deeplinkRequested(url))
         }

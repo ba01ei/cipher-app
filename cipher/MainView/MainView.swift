@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  MainView.swift
 //  cipher
 //
 //  Created by Bao Lei on 5/24/25.
@@ -10,7 +10,7 @@ import MiniRedux
 import SwiftUI
 import GameKit
 
-struct ContentView: View {
+struct MainView: View {
   @Bindable var store: MainStore
   @Environment(\.displayScale) var displayScale
 

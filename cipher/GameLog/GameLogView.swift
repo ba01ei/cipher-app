@@ -30,9 +30,9 @@ struct GameLogView: View {
             }
             ForEach(games) { game in
               HStack {
-                Image(systemName: game.hardMode == true ? "medal.fill" : (game.success ? "trophy.circle.fill" : "xmark.circle.fill"))
+                Image(systemName: game.iconSFSymbol)
                   .font(.system(size: 20))
-                  .foregroundStyle(game.hardMode == true ? Color.yellow : (game.success ? Color.green : Color.red))
+                  .foregroundStyle(game.displayColor)
                 VStack(alignment: .leading) {
                   Text(game.display)
                   if let time = game.time {

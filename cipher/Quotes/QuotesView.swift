@@ -9,7 +9,7 @@ import MiniRedux
 import SwiftUI
 
 struct QuotesView: View {
-  let store: QuotesStore
+  @Bindable var store: QuotesStore
   @Environment(\.openURL) var openURL
 
   var body: some View {
@@ -25,7 +25,7 @@ struct QuotesView: View {
             Spacer()
           }
         } else if !store.notDeleted.isEmpty {
-          List(store.notDeleted, id: \.text) { quote in
+          List(store.filteredQuotes, id: \.text) { quote in
             VStack {
               Text(quote.text).foregroundColor(Color.primary) + Text(" - " + quote.by).foregroundColor(.secondary)
             }
@@ -43,6 +43,7 @@ struct QuotesView: View {
           }
         }
       }
+      .searchable(text: $store.searchText, prompt: "Search quotes or authors")
       .navigationTitle("Decoded Quotes — \(store.notDeleted.count)")
       .toolbarTitleDisplayMode(.inline)
       .toolbar {

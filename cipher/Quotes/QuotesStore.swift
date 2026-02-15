@@ -10,10 +10,20 @@ import MiniRedux
 
 @Observable class QuotesStore: BaseStore<QuotesStore.Action> {
   var quotes: [Quote]?
+  var searchText = ""
   var notDeleted: [Quote] {
     return quotes?.filter({ quote in
       quote.deleted != true
     }) ?? []
+  }
+  var filteredQuotes: [Quote] {
+    if searchText.isEmpty {
+      return notDeleted
+    }
+    return notDeleted.filter { quote in
+      quote.text.localizedCaseInsensitiveContains(searchText)
+        || quote.by.localizedCaseInsensitiveContains(searchText)
+    }
   }
   
   enum Action {

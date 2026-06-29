@@ -34,9 +34,9 @@ extension GKLocalPlayer: @unchecked @retroactive Sendable {}
   override func reduce(_ action: Action) -> Effect<Action> {
     switch action {
     case .initialized:
-      return .run { _ in
+      return .run { [weak self] _ in
         GKLocalPlayer.local.authenticateHandler = { viewController, error in
-          Task { @MainActor [weak self] in
+          Task { @MainActor in
             self?.send(.gameCenterAuthStateUpdated(GKLocalPlayer.local.isAuthenticated, error))
             if let viewController {
               self?.send(.authViewPresentationRequested(viewController))
